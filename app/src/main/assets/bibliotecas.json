@@ -1,0 +1,72 @@
+{
+  "bibliotecas": [
+    {
+      "nombre": "Biblioteca Central CDMX",
+      "latitud": 19.432608,
+      "longitud": -99.133209,
+      "direccion": "Plaza de la Constitución S/N, Centro Histórico, CDMX",
+      "horario": "Lunes a Viernes: 9:00-20:00, Sábados: 10:00-14:00",
+      "disponible": true,
+      "libros_disponibles": [
+        "Cien años de soledad - Gabriel García Márquez",
+        "1984 - George Orwell",
+        "El principito - Antoine de Saint-Exupéry",
+        "Don Quijote de la Mancha - Miguel de Cervantes",
+        "Rayuela - Julio Cortázar",
+        "La tregua - Mario Benedetti"
+      ]
+    },
+    {
+      "nombre": "Biblioteca Vasconcelos",
+      "latitud": 19.4438,
+      "longitud": -99.1494,
+      "direccion": "Eje 1 Norte Mosqueta S/N, Buenavista, CDMX",
+      "horario": "Lunes a Domingo: 8:30-19:30",
+      "disponible": true,
+      "libros_disponibles": [
+        "Pedro Páramo - Juan Rulfo",
+        "Los detectives salvajes - Roberto Bolaño",
+        "Ficciones - Jorge Luis Borges",
+        "El laberinto de la soledad - Octavio Paz",
+        "La muerte de Artemio Cruz - Carlos Fuentes"
+      ]
+    },
+    {
+      "nombre": "Biblioteca Miguel Hidalgo",
+      "latitud": 19.428,
+      "longitud": -99.127,
+      "direccion": "Av. Revolución 1870, San Ángel, CDMX",
+      "horario": "Lunes a Sábado: 9:00-18:00",
+      "disponible": false,
+      "libros_disponibles": []
+    },
+    {
+      "nombre": "Biblioteca Benito Juárez",
+      "latitud": 19.440,
+      "longitud": -99.135,
+      "direccion": "Calzada de Tlalpan 1608, Colonia Parque San Andrés, CDMX",
+      "horario": "Martes a Domingo: 10:00-18:00",
+      "disponible": true,
+      "libros_disponibles": [
+        "Crimen y castigo - Fiódor Dostoyevski",
+        "Orgullo y prejuicio - Jane Austen",
+        "El amor en los tiempos del cólera - Gabriel García Márquez",
+        "Drácula - Bram Stoker"
+      ]
+    },
+    {
+      "nombre": "Biblioteca Cuauhtémoc",
+      "latitud": 19.425,
+      "longitud": -99.130,
+      "direccion": "Av. Cuauhtémoc 1532, Colonia Santa Cruz Atoyac, CDMX",
+      "horario": "Lunes a Viernes: 8:00-19:00, Sábados: 9:00-13:00",
+      "disponible": true,
+      "libros_disponibles": [
+        "Harry Potter y la piedra filosofal - J.K. Rowling",
+        "El señor de los anillos - J.R.R. Tolkien",
+        "Las crónicas de Narnia - C.S. Lewis",
+        "El hobbit - J.R.R. Tolkien"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.bibliocloud">
+
+    <!-- ===== PERMISOS ===== -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <!-- ===== APLICACIÓN ===== -->
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.BiblioCloud"
+        android:usesCleartextTraffic="false">
+
+        <!-- ===== ACTIVIDADES ===== -->
+        <activity
+            android:name=".BibliotecaDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.BiblioCloud.NoActionBar" />
+
+        <activity
+            android:name=".MapActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".SuggestionsManagementActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".LoanManagementActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".BookManagementActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".UserManagementActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".AdminDashboardActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false"
+            android:theme="@style/Theme.BiblioCloud.NoActionBar" />
+
+        <activity
+            android:name=".SuggestionsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.BiblioCloud.NoActionBar" />
+
+        <activity
+            android:name=".FavoritesActivity"
+            android:exported="false"
+            android:theme="@style/Theme.BiblioCloud.NoActionBar" />
+
+        <activity
+            android:name=".LoginActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".SearchActivity"
+            android:exported="false"
+            android:theme="@style/Theme.BiblioCloud.NoActionBar" />
+
+        <!-- ===== SERVICIO DE FIREBASE CLOUD MESSAGING ===== -->
+        <service
+            android:name=".services.FirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <!-- ===== CLAVE DE GOOGLE MAPS ===== -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBTzm4kVIIjfgJoxYrOZmKze8vhLtpZhR4" />
+
+    </application>
+
+</manifest>

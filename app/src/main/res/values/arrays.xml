@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="search_filters">
+        <item>Todos</item>
+        <item>Título</item>
+        <item>Autor</item>
+        <item>Categoría</item>
+        <item>Disponibles</item>
+    </string-array>
+
+    <!-- NUEVO: Categorías para sugerencias -->
+    <string-array name="book_categories">
+        <item>Novela</item>
+        <item>Ciencia Ficción</item>
+        <item>Fantasía</item>
+        <item>Romance</item>
+        <item>Misterio</item>
+        <item>Thriller</item>
+        <item>Biografía</item>
+        <item>Historia</item>
+        <item>Ciencia</item>
+        <item>Tecnología</item>
+        <item>Arte</item>
+        <item>Filosofía</item>
+        <item>Psicología</item>
+        <item>Autoayuda</item>
+        <item>Negocios</item>
+        <item>Viajes</item>
+        <item>Cocina</item>
+        <item>Infantil</item>
+        <item>Juvenil</item>
+        <item>Otro</item>
+    </string-array>
+</resources>

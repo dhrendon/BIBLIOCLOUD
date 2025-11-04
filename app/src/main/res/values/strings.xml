@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">BiblioCloud</string>
+    <string name="action_logout">Cerrar Sesión</string>
+    <string name="action_settings">Configuración</string>
+
+
+    <string name="welcome_message">Bienvenido a BiblioCloud</string>
+    <string name="login_title">Iniciar Sesión</string>
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Contraseña</string>
+    <string name="login_button">Iniciar Sesión</string>
+    <string name="no_account_message">No tienes cuenta? Contacta al administrador</string>
+    <string name="search_hint">Buscar por título, autor o categoría...</string>
+    <string name="clear_filters">Limpiar</string>
+    <string name="results_count">Resultados: %d</string>
+    <string name="empty_search_title">No se encontraron libros</string>
+    <string name="empty_search_message">Intenta con otros términos de búsqueda</string>
+</resources>

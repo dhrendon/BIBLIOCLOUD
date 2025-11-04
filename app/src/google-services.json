@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "993865957507",
+    "project_id": "bibliocloud-7931c",
+    "storage_bucket": "bibliocloud-7931c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:993865957507:android:5fd320c77d9c5fabc9dbb6",
+        "android_client_info": {
+          "package_name": "com.example.bibliocloud"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAeRw2X6I5VK9qatAo8HljNPHYA3o15_xg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

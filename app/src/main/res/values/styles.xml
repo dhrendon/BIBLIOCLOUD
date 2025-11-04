@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Base.Theme.BiblioCloud" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/dark_brown</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/accent_brown</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="android:windowBackground">@color/colorBackground</item>
+        <item name="android:statusBarColor">@color/dark_brown</item>
+    </style>
+
+
+    <style name="Base.Theme.BiblioCloud.NoActionBar" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/dark_brown</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/accent_brown</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="android:windowBackground">@color/colorBackground</item>
+        <item name="android:statusBarColor">@color/dark_brown</item>
+    </style>
+
+
+    <style name="Theme.BiblioCloud" parent="Base.Theme.BiblioCloud" />
+    <style name="Theme.BiblioCloud.NoActionBar" parent="Base.Theme.BiblioCloud.NoActionBar" />
+</resources>
