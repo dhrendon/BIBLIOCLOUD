@@ -1,184 +1,279 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
     android:background="@color/colorBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <!-- Header -->
+        <!-- Encabezado -->
         <TextView
-            android:id="@+id/tvWelcome"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Panel de Administración"
+            android:text="🏛️ Panel de Administración"
             android:textSize="24sp"
             android:textStyle="bold"
+            android:textColor="@color/colorPrimary"
             android:gravity="center"
-            android:layout_marginBottom="24dp"
-            android:textColor="@color/colorTextPrimary" />
+            android:layout_marginBottom="24dp"/>
 
-        <!-- Estadísticas Rápidas -->
-        <LinearLayout
+        <!-- Estadísticas -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="24dp">
+            android:layout_marginBottom="24dp"
+            app:cardElevation="4dp"
+            app:cardCornerRadius="8dp"
+            app:cardBackgroundColor="@color/light_brown">
 
-            <!-- Tarjeta Libros -->
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:orientation="vertical"
-                android:background="@drawable/spinner_background"
-                android:padding="16dp"
-                android:layout_margin="4dp"
-                android:backgroundTint="@color/light_brown">
+                android:padding="16dp">
 
                 <TextView
-                    android:id="@+id/tvTotalLibros"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textSize="20sp"
+                    android:text="📊 Estadísticas del Sistema"
+                    android:textSize="18sp"
                     android:textStyle="bold"
-                    android:gravity="center"
-                    android:textColor="@color/dark_brown" />
+                    android:textColor="@color/colorPrimary"
+                    android:layout_marginBottom="16dp"/>
 
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Libros"
-                    android:textSize="12sp"
-                    android:gravity="center"
-                    android:textColor="@color/colorTextSecondary" />
+                    android:orientation="horizontal"
+                    android:weightSum="2">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/tvTotalLibros"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="32sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/colorPrimary"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Libros"
+                            android:textSize="14sp"
+                            android:textColor="@color/colorTextSecondary"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/tvTotalUsuarios"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="32sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/colorPrimary"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Usuarios"
+                            android:textSize="14sp"
+                            android:textColor="@color/colorTextSecondary"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorTextSecondary"
+                    android:layout_marginVertical="16dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="3">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/tvTotalPrestamos"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/colorPrimary"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Préstamos"
+                            android:textSize="12sp"
+                            android:textColor="@color/colorTextSecondary"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/tvTotalSucursales"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/colorPrimary"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Sucursales"
+                            android:textSize="12sp"
+                            android:textColor="@color/colorTextSecondary"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/tvTotalCompras"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/colorPrimary"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Compras"
+                            android:textSize="12sp"
+                            android:textColor="@color/colorTextSecondary"/>
+                    </LinearLayout>
+                </LinearLayout>
 
             </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
-            <!-- Tarjeta Usuarios -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:background="@drawable/spinner_background"
-                android:padding="16dp"
-                android:layout_margin="4dp"
-                android:backgroundTint="@color/light_brown">
+        <!-- Opciones de gestión -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Opciones de Gestión"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimary"
+            android:layout_marginBottom="16dp"/>
 
-                <TextView
-                    android:id="@+id/tvTotalUsuarios"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:gravity="center"
-                    android:textColor="@color/dark_brown" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Usuarios"
-                    android:textSize="12sp"
-                    android:gravity="center"
-                    android:textColor="@color/colorTextSecondary" />
-
-            </LinearLayout>
-
-            <!-- Tarjeta Préstamos -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:background="@drawable/spinner_background"
-                android:padding="16dp"
-                android:layout_margin="4dp"
-                android:backgroundTint="@color/light_brown">
-
-                <TextView
-                    android:id="@+id/tvTotalPrestamos"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:gravity="center"
-                    android:textColor="@color/dark_brown" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Préstamos"
-                    android:textSize="12sp"
-                    android:gravity="center"
-                    android:textColor="@color/colorTextSecondary" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <!-- Resto de tu código permanece igual -->
-        <com.google.android.material.button.MaterialButton
+        <!-- Gestión de Usuarios -->
+        <Button
             android:id="@+id/btnGestionUsuarios"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text=" Gestión de Usuarios"
-            android:layout_marginBottom="8dp"
+            android:text="👤 Gestión de Usuarios"
+            android:textSize="16sp"
             android:backgroundTint="@color/colorPrimary"
-            android:textSize="14sp"
-            android:textColor="@color/white"
-            style="@style/Widget.Material3.Button" />
+            android:layout_marginBottom="12dp"
+            android:padding="16dp"/>
 
-        <com.google.android.material.button.MaterialButton
+        <!-- Gestión de Libros -->
+        <Button
             android:id="@+id/btnGestionLibros"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text=" Gestión de Libros"
-            android:layout_marginBottom="8dp"
+            android:text="📚 Gestión de Libros"
+            android:textSize="16sp"
             android:backgroundTint="@color/colorPrimary"
-            android:textSize="14sp"
-            android:textColor="@color/white"
-            style="@style/Widget.Material3.Button" />
+            android:layout_marginBottom="12dp"
+            android:padding="16dp"/>
 
-        <com.google.android.material.button.MaterialButton
+        <!-- 🆕 Gestión de Sucursales -->
+        <Button
+            android:id="@+id/btnGestionSucursales"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🏢 Gestión de Sucursales"
+            android:textSize="16sp"
+            android:backgroundTint="@color/accent_brown"
+            android:layout_marginBottom="12dp"
+            android:padding="16dp"/>
+
+        <!-- Gestión de Préstamos -->
+        <Button
             android:id="@+id/btnGestionPrestamos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text=" Gestión de Préstamos"
-            android:layout_marginBottom="8dp"
+            android:text="📖 Gestión de Préstamos"
+            android:textSize="16sp"
             android:backgroundTint="@color/colorPrimary"
-            android:textSize="14sp"
-            android:textColor="@color/white"
-            style="@style/Widget.Material3.Button" />
+            android:layout_marginBottom="12dp"
+            android:padding="16dp"/>
 
-        <com.google.android.material.button.MaterialButton
+        <!-- 🆕 Gestión de Compras -->
+        <Button
+            android:id="@+id/btnGestionCompras"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🛒 Gestión de Compras"
+            android:textSize="16sp"
+            android:backgroundTint="@color/green"
+            android:layout_marginBottom="12dp"
+            android:padding="16dp"/>
+
+        <!-- Sugerencias -->
+        <Button
             android:id="@+id/btnSugerencias"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text=" Sugerencias de Libros"
-            android:layout_marginBottom="16dp"
-            android:backgroundTint="@color/colorPrimary"
-            android:textSize="14sp"
-            android:textColor="@color/white"
-            style="@style/Widget.Material3.Button" />
+            android:text="💡 Ver Sugerencias"
+            android:textSize="16sp"
+            android:backgroundTint="@color/orange"
+            android:layout_marginBottom="24dp"
+            android:padding="16dp"/>
 
-        <com.google.android.material.button.MaterialButton
+        <!-- Cerrar Sesión -->
+        <Button
             android:id="@+id/btnCerrarSesion"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Cerrar Sesión"
-            android:backgroundTint="@color/accent_brown"
-            android:textSize="14sp"
-            android:textColor="@color/white"
-            style="@style/Widget.Material3.Button" />
+            android:text="🚪 Cerrar Sesión"
+            android:textSize="16sp"
+            android:backgroundTint="@color/red"
+            android:padding="16dp"/>
 
     </LinearLayout>
-
 </ScrollView>

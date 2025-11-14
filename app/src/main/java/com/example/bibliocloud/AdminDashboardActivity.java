@@ -6,17 +6,16 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 
 public class AdminDashboardActivity extends AppCompatActivity {
 
-    private Button btnGestionUsuarios, btnGestionLibros, btnGestionPrestamos, btnSugerencias, btnCerrarSesion;
-    private TextView tvTotalLibros, tvTotalUsuarios, tvTotalPrestamos;
+    private Button btnGestionUsuarios, btnGestionLibros, btnGestionPrestamos,
+            btnSugerencias, btnGestionSucursales, btnGestionCompras, btnCerrarSesion;
+    private TextView tvTotalLibros, tvTotalUsuarios, tvTotalPrestamos,
+            tvTotalSucursales, tvTotalCompras;
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
@@ -26,36 +25,38 @@ public class AdminDashboardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_dashboard);
 
-        // === Inicializar Firebase ===
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        // === Inicializar vistas ===
         inicializarVistas();
-
-        // === Cargar estadísticas ===
         cargarEstadisticasTiempoReal();
-
-        // === Configurar listeners ===
         configurarListeners();
     }
 
     private void inicializarVistas() {
-        // Botones
+        // Botones existentes
         btnGestionUsuarios = findViewById(R.id.btnGestionUsuarios);
         btnGestionLibros = findViewById(R.id.btnGestionLibros);
         btnGestionPrestamos = findViewById(R.id.btnGestionPrestamos);
         btnSugerencias = findViewById(R.id.btnSugerencias);
         btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
 
-        // TextViews para estadísticas
+        // 🆕 Nuevos botones
+        btnGestionSucursales = findViewById(R.id.btnGestionSucursales);
+        btnGestionCompras = findViewById(R.id.btnGestionCompras);
+
+        // Estadísticas existentes
         tvTotalLibros = findViewById(R.id.tvTotalLibros);
         tvTotalUsuarios = findViewById(R.id.tvTotalUsuarios);
         tvTotalPrestamos = findViewById(R.id.tvTotalPrestamos);
+
+        // 🆕 Nuevas estadísticas
+        tvTotalSucursales = findViewById(R.id.tvTotalSucursales);
+        tvTotalCompras = findViewById(R.id.tvTotalCompras);
     }
 
     private void cargarEstadisticasTiempoReal() {
-        // Listener en tiempo real para libros
+        // Libros
         db.collection("libros")
                 .addSnapshotListener((value, error) -> {
                     if (error != null) {
@@ -67,7 +68,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
                     }
                 });
 
-        // Listener en tiempo real para usuarios
+        // Usuarios
         db.collection("usuarios")
                 .addSnapshotListener((value, error) -> {
                     if (error != null) {
@@ -79,7 +80,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
                     }
                 });
 
-        // Listener en tiempo real para préstamos
+        // Préstamos
         db.collection("prestamos")
                 .addSnapshotListener((value, error) -> {
                     if (error != null) {
@@ -90,34 +91,70 @@ public class AdminDashboardActivity extends AppCompatActivity {
                         tvTotalPrestamos.setText(String.valueOf(value.size()));
                     }
                 });
+
+        // 🆕 Sucursales
+        db.collection("sucursales")
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        tvTotalSucursales.setText("0");
+                        return;
+                    }
+                    if (value != null) {
+                        tvTotalSucursales.setText(String.valueOf(value.size()));
+                    }
+                });
+
+        // 🆕 Compras
+        db.collection("compras")
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        tvTotalCompras.setText("0");
+                        return;
+                    }
+                    if (value != null) {
+                        tvTotalCompras.setText(String.valueOf(value.size()));
+                    }
+                });
     }
 
     private void configurarListeners() {
-        // === Abrir gestión de usuarios ===
+        // Gestión de usuarios
         btnGestionUsuarios.setOnClickListener(v -> {
             Intent intent = new Intent(this, UserManagementActivity.class);
             startActivity(intent);
         });
 
-        // === Abrir gestión de libros ===
+        // Gestión de libros
         btnGestionLibros.setOnClickListener(v -> {
             Intent intent = new Intent(this, BookManagementActivity.class);
             startActivity(intent);
         });
 
-        // === Abrir gestión de préstamos ===
+        // Gestión de préstamos
         btnGestionPrestamos.setOnClickListener(v -> {
             Intent intent = new Intent(this, LoanManagementActivity.class);
             startActivity(intent);
         });
 
-        // === Abrir gestión de sugerencias ===
+        // Gestión de sugerencias
         btnSugerencias.setOnClickListener(v -> {
             Intent intent = new Intent(this, SuggestionsManagementActivity.class);
             startActivity(intent);
         });
 
-        // === Cerrar sesión con Firebase ===
+        // 🆕 Gestión de sucursales
+        btnGestionSucursales.setOnClickListener(v -> {
+            Intent intent = new Intent(this, BranchManagementActivity.class);
+            startActivity(intent);
+        });
+
+        // 🆕 Gestión de compras
+        btnGestionCompras.setOnClickListener(v -> {
+            Intent intent = new Intent(this, AdminPurchasesActivity.class);
+            startActivity(intent);
+        });
+
+        // Cerrar sesión
         btnCerrarSesion.setOnClickListener(v -> {
             mAuth.signOut();
             Intent intent = new Intent(this, LoginActivity.class);
@@ -131,7 +168,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        // 🔹 Verificar si hay sesión activa
         if (mAuth.getCurrentUser() == null) {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
@@ -142,7 +178,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Recargar estadísticas cuando la actividad se reanude
         cargarEstadisticasTiempoReal();
     }
 }

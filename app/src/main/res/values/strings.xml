@@ -2,17 +2,107 @@
     <string name="app_name">BiblioCloud</string>
     <string name="action_logout">Cerrar Sesión</string>
     <string name="action_settings">Configuración</string>
+    <string name="action_profile">Mi Perfil</string>
+    <string name="action_admin">Panel Admin</string>
 
-
+    <!-- Login -->
     <string name="welcome_message">Bienvenido a BiblioCloud</string>
     <string name="login_title">Iniciar Sesión</string>
     <string name="email_hint">Email</string>
     <string name="password_hint">Contraseña</string>
     <string name="login_button">Iniciar Sesión</string>
+    <string name="register_button">Registrarse</string>
     <string name="no_account_message">No tienes cuenta? Contacta al administrador</string>
+
+    <!-- Search -->
     <string name="search_hint">Buscar por título, autor o categoría...</string>
     <string name="clear_filters">Limpiar</string>
     <string name="results_count">Resultados: %d</string>
     <string name="empty_search_title">No se encontraron libros</string>
     <string name="empty_search_message">Intenta con otros términos de búsqueda</string>
+
+    <!-- Branch Management -->
+    <string name="branch_management_title">Gestión de Sucursales</string>
+    <string name="add_branch">Agregar Sucursal</string>
+    <string name="branch_name">Nombre de la Sucursal</string>
+    <string name="branch_address">Dirección</string>
+    <string name="branch_phone">Teléfono</string>
+    <string name="branch_schedule">Horario</string>
+    <string name="select_location">Seleccionar Ubicación en el Mapa</string>
+    <string name="location_not_selected">Ubicación no seleccionada</string>
+    <string name="manager_name">Nombre del Gerente</string>
+    <string name="manager_email">Email del Gerente</string>
+
+    <!-- Inventory -->
+    <string name="inventory_management">Gestión de Inventario</string>
+    <string name="shelf_number">Número de Anaquel</string>
+    <string name="shelf_section">Sección</string>
+    <string name="shelf_level">Nivel del Anaquel</string>
+    <string name="physical_stock">Cantidad de Copias Físicas</string>
+    <string name="online_available">Disponible en formato digital</string>
+    <string name="for_sale">Disponible para venta</string>
+    <string name="sale_price">Precio de Venta (MXN)</string>
+    <string name="rental_price">Precio de Renta (MXN)</string>
+    <string name="add_to_inventory">Agregar al Inventario</string>
+
+    <!-- Purchase -->
+    <string name="purchase_summary">Resumen de Compra</string>
+    <string name="shipping_address">Dirección de Envío</string>
+    <string name="payment_method">Método de Pago</string>
+    <string name="payment_card">Tarjeta de Crédito/Débito</string>
+    <string name="payment_paypal">PayPal</string>
+    <string name="payment_cash">Efectivo (Pago en sucursal)</string>
+    <string name="payment_transfer">Transferencia Bancaria</string>
+    <string name="subtotal">Subtotal</string>
+    <string name="tax">IVA (16%%)</string>
+    <string name="total">Total</string>
+    <string name="accept_terms">Acepto los términos y condiciones de compra</string>
+    <string name="confirm_purchase">Confirmar Compra</string>
+
+    <!-- Orders -->
+    <string name="my_purchases">Mis Compras</string>
+    <string name="order_history">Historial de Órdenes</string>
+    <string name="order_status">Estado de la Orden</string>
+    <string name="pending">Pendiente</string>
+    <string name="processing">Procesando</string>
+    <string name="shipped">Enviado</string>
+    <string name="delivered">Entregado</string>
+    <string name="cancelled">Cancelado</string>
+    <string name="all_orders">Todas</string>
+
+    <!-- Admin -->
+    <string name="admin_dashboard">Panel de Administración</string>
+    <string name="user_management">Gestión de Usuarios</string>
+    <string name="book_management">Gestión de Libros</string>
+    <string name="branch_management">Gestión de Sucursales</string>
+    <string name="loan_management">Gestión de Préstamos</string>
+    <string name="purchase_management">Gestión de Compras</string>
+    <string name="suggestions_management">Ver Sugerencias</string>
+    <string name="total_books">Total de Libros</string>
+    <string name="total_users">Total de Usuarios</string>
+    <string name="total_branches">Total de Sucursales</string>
+    <string name="total_purchases">Total de Compras</string>
+
+
+    <!-- Messages -->
+    <string name="success_branch_added">Sucursal agregada exitosamente</string>
+    <string name="success_inventory_added">Libro agregado al inventario</string>
+    <string name="success_purchase_completed">¡Compra realizada exitosamente!</string>
+    <string name="error_loading_data">Error al cargar datos</string>
+    <string name="error_no_location">Selecciona la ubicación en el mapa</string>
+    <string name="error_required_fields">Por favor completa todos los campos requeridos</string>
+    <string name="confirm_delete">¿Estás seguro de eliminar este elemento?</string>
+    <string name="no_items_found">No se encontraron elementos</string>
+
+    <!-- Common -->
+    <string name="back">Volver</string>
+    <string name="cancel">Cancelar</string>
+    <string name="save">Guardar</string>
+    <string name="delete">Eliminar</string>
+    <string name="edit">Editar</string>
+    <string name="confirm">Confirmar</string>
+    <string name="close">Cerrar</string>
+    <string name="loading">Cargando...</string>
+    <string name="yes">Sí</string>
+    <string name="no">No</string>
 </resources>

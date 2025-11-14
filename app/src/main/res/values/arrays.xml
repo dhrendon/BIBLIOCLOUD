@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string-array name="search_filters">
         <item>Todos</item>
         <item>Título</item>
@@ -8,7 +9,6 @@
         <item>Disponibles</item>
     </string-array>
 
-    <!-- NUEVO: Categorías para sugerencias -->
     <string-array name="book_categories">
         <item>Novela</item>
         <item>Ciencia Ficción</item>
@@ -31,4 +31,6 @@
         <item>Juvenil</item>
         <item>Otro</item>
     </string-array>
+
 </resources>
+

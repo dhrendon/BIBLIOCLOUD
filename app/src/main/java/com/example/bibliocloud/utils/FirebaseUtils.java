@@ -11,19 +11,68 @@ import com.google.firebase.firestore.FirebaseFirestoreSettings;
 public class FirebaseUtils {
 
     private static final String TAG = "FirebaseUtils";
+    private static boolean persistenceEnabled = false;
 
-    // Configurar Firestore para modo offline
+    // -------------------------------------------------------------------------
+    // 🔹 1. FIRESTORE OFFLINE PERSISTENCE
+    // -------------------------------------------------------------------------
+
+    /**
+     * Habilita la persistencia offline de Firestore con caché ilimitado.
+     */
     public static void enableOfflinePersistence() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
-                .setPersistenceEnabled(true)
-                .setCacheSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
-                .build();
-        db.setFirestoreSettings(settings);
-        Log.d(TAG, "Persistencia offline habilitada");
+        if (persistenceEnabled) {
+            Log.d(TAG, "Persistencia offline ya está habilitada");
+            return;
+        }
+
+        try {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                    .setPersistenceEnabled(true)
+                    .setCacheSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
+                    .build();
+
+            db.setFirestoreSettings(settings);
+            persistenceEnabled = true;
+
+            Log.d(TAG, "Persistencia offline habilitada correctamente");
+        } catch (Exception e) {
+            Log.e(TAG, "Error al habilitar persistencia: " + e.getMessage());
+        }
     }
 
-    // Verificar conexión a internet
+    /**
+     * Deshabilita la persistencia offline (útil para pruebas).
+     */
+    public static void disableOfflinePersistence() {
+        try {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                    .setPersistenceEnabled(false)
+                    .build();
+
+            db.setFirestoreSettings(settings);
+            persistenceEnabled = false;
+
+            Log.d(TAG, "Persistencia offline deshabilitada");
+        } catch (Exception e) {
+            Log.e(TAG, "Error al deshabilitar persistencia: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Retorna si la persistencia está habilitada.
+     */
+    public static boolean isPersistenceEnabled() {
+        return persistenceEnabled;
+    }
+
+
+    // -------------------------------------------------------------------------
+    // 🔹 2. VERIFICACIÓN DE CONEXIÓN A INTERNET
+    // -------------------------------------------------------------------------
+
     public static boolean isNetworkAvailable(Context context) {
         ConnectivityManager connectivityManager =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -35,7 +84,11 @@ public class FirebaseUtils {
         return false;
     }
 
-    // Manejar errores de Firebase
+
+    // -------------------------------------------------------------------------
+    // 🔹 3. INTERPRETAR MENSAJES DE ERROR DE FIREBASE
+    // -------------------------------------------------------------------------
+
     public static String getFirebaseErrorMessage(Exception exception) {
         String errorMessage = exception.getMessage();
 
@@ -43,7 +96,7 @@ public class FirebaseUtils {
             return "Error desconocido";
         }
 
-        // Personalizar mensajes de error comunes
+        // Errores comunes - traducidos a español
         if (errorMessage.contains("PERMISSION_DENIED")) {
             return "No tienes permisos para realizar esta acción";
         } else if (errorMessage.contains("NOT_FOUND")) {
@@ -58,7 +111,10 @@ public class FirebaseUtils {
             return "Datos inválidos proporcionados";
         } else if (errorMessage.contains("DEADLINE_EXCEEDED")) {
             return "La operación tardó demasiado tiempo";
-        } else if (errorMessage.contains("email-already-in-use")) {
+        }
+
+        // Errores de autenticación
+        if (errorMessage.contains("email-already-in-use")) {
             return "Este correo electrónico ya está registrado";
         } else if (errorMessage.contains("invalid-email")) {
             return "Correo electrónico inválido";
@@ -73,7 +129,11 @@ public class FirebaseUtils {
         return errorMessage;
     }
 
-    // Validar campos de entrada
+
+    // -------------------------------------------------------------------------
+    // 🔹 4. VALIDACIÓN DE CAMPOS
+    // -------------------------------------------------------------------------
+
     public static boolean isValidEmail(String email) {
         return email != null && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }

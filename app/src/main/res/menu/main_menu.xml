@@ -2,21 +2,33 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!-- Perfil -->
     <item
         android:id="@+id/action_profile"
+        android:icon="@android:drawable/ic_menu_myplaces"
         android:title="Mi Perfil"
-        android:icon="@android:drawable/ic_menu_my_calendar"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom"/>
 
+    <!-- Panel Admin (solo visible para administradores) -->
     <item
-        android:id="@+id/action_logout"
-        android:title="Cerrar Sesión"
-        android:icon="@android:drawable/ic_lock_power_off"
-        app:showAsAction="never" />
+        android:id="@+id/action_admin"
+        android:icon="@android:drawable/ic_menu_manage"
+        android:title="Panel Admin"
+        android:visible="false"
+        app:showAsAction="never"/>
 
+    <!-- Configuración -->
     <item
         android:id="@+id/action_settings"
+        android:icon="@android:drawable/ic_menu_preferences"
         android:title="Configuración"
-        app:showAsAction="never" />
+        app:showAsAction="never"/>
+
+    <!-- Cerrar Sesión -->
+    <item
+        android:id="@+id/action_logout"
+        android:icon="@android:drawable/ic_lock_power_off"
+        android:title="Cerrar Sesión"
+        app:showAsAction="never"/>
 
 </menu>

@@ -9,11 +9,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.gridlayout.widget.GridLayout;
-
 import com.example.bibliocloud.repositories.BookRepository;
 import com.example.bibliocloud.services.AuthService;
 import com.example.bibliocloud.utils.FirebaseUtils;
@@ -22,11 +21,10 @@ import com.google.firebase.messaging.FirebaseMessaging;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-
     private TextView tvWelcome;
+    private CardView cardAdminPanel;
     private boolean isAdmin = false;
     private String userEmail = "";
-
     private AuthService authService;
     private BookRepository bookRepository;
 
@@ -36,13 +34,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         tvWelcome = findViewById(R.id.tvWelcome);
+        cardAdminPanel = findViewById(R.id.cardAdminPanel);
 
-        // 🔥 Inicializar Firebase Utils y servicios
+        // Configurar toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         FirebaseUtils.enableOfflinePersistence();
         authService = new AuthService();
         bookRepository = new BookRepository();
 
-        // 🔑 Verificar si el usuario está autenticado
         if (!authService.isUserLoggedIn()) {
             Intent loginIntent = new Intent(this, LoginActivity.class);
             startActivity(loginIntent);
@@ -50,10 +51,8 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        // 📡 Obtener token de FCM para notificaciones push
         getFCMToken();
 
-        // 🧠 Obtener datos del login o de FirebaseAuth
         Intent intent = getIntent();
         userEmail = intent.getStringExtra("USER_EMAIL");
         isAdmin = intent.getBooleanExtra("IS_ADMIN", false);
@@ -67,10 +66,12 @@ public class MainActivity extends AppCompatActivity {
                 : "Bienvenido " + (userEmail != null ? userEmail : "");
         tvWelcome.setText(welcomeMessage);
 
-        // 💾 Guardar información del usuario
-        saveUserInfo();
+        // Mostrar/ocultar tarjeta de admin
+        if (cardAdminPanel != null) {
+            cardAdminPanel.setVisibility(isAdmin ? View.VISIBLE : View.GONE);
+        }
 
-        // 🎨 Configurar eventos de tarjetas
+        saveUserInfo();
         setupCardClicks();
     }
 
@@ -81,15 +82,8 @@ public class MainActivity extends AppCompatActivity {
                         Log.w(TAG, "Error al obtener token FCM", task.getException());
                         return;
                     }
-
                     String token = task.getResult();
                     Log.d(TAG, "Token FCM obtenido: " + token);
-
-                    if (authService.getCurrentFirebaseUser() != null) {
-                        String userId = authService.getCurrentFirebaseUser().getUid();
-                        // Aquí podrías guardar el token en Firestore:
-                        // userRepository.updateFcmToken(userId, token, ...);
-                    }
                 });
     }
 
@@ -124,11 +118,26 @@ public class MainActivity extends AppCompatActivity {
             case 2: // Sugerencias
                 startActivity(new Intent(this, SuggestionsActivity.class));
                 break;
-            case 3: // Acerca de
-                Toast.makeText(this, "Acerca de - Próximamente", Toast.LENGTH_SHORT).show();
+            case 3: // Catálogo por Sucursal
+                startActivity(new Intent(this, BranchBooksCatalogActivity.class));
                 break;
-            case 4: // Mapa
+            case 4: // Mapa de Bibliotecas
                 startActivity(new Intent(this, MapActivity.class));
+                break;
+            case 5: // Mis Compras
+                startActivity(new Intent(this, MyPurchasesActivity.class));
+                break;
+            case 6: // Panel Admin (solo admin)
+                if (isAdmin) {
+                    startActivity(new Intent(this, AdminDashboardActivity.class));
+                } else {
+                    Toast.makeText(this, "Acceso solo para administradores",
+                            Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case 7: // Acerca de
+                Toast.makeText(this, "BiblioCloud v2.0 - Sistema de Gestión Bibliotecaria",
+                        Toast.LENGTH_SHORT).show();
                 break;
         }
     }
@@ -136,6 +145,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
+
+        // Mostrar opción de gestión solo para administradores
+        MenuItem adminItem = menu.findItem(R.id.action_admin);
+        if (adminItem != null) {
+            adminItem.setVisible(isAdmin);
+        }
+
         return true;
     }
 
@@ -151,6 +167,9 @@ public class MainActivity extends AppCompatActivity {
             return true;
         } else if (id == R.id.action_settings) {
             Toast.makeText(this, "Configuración - Próximamente", Toast.LENGTH_SHORT).show();
+            return true;
+        } else if (id == R.id.action_admin && isAdmin) {
+            startActivity(new Intent(this, AdminDashboardActivity.class));
             return true;
         }
 

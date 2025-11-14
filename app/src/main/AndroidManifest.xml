@@ -1,104 +1,183 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.bibliocloud">
 
-    <!-- ===== PERMISOS ===== -->
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- Permisos -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28"/>
 
     <uses-feature
         android:name="android.hardware.camera"
-        android:required="false" />
+        android:required="false"/>
 
-    <!-- ===== APLICACIÓN ===== -->
     <application
         android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
         android:theme="@style/Theme.BiblioCloud"
-        android:usesCleartextTraffic="false">
+        tools:targetApi="31">
 
-        <!-- ===== ACTIVIDADES ===== -->
-        <activity
-            android:name=".BibliotecaDetailActivity"
-            android:exported="false"
-            android:theme="@style/Theme.BiblioCloud.NoActionBar" />
+        <!-- Google Maps API Key -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBTzm4kVIIjfgJoxYrOZmKze8vhLtpZhR4"/>
 
-        <activity
-            android:name=".MapActivity"
-            android:exported="false" />
+        <!-- Google Play Services Version -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version"/>
 
-        <activity
-            android:name=".SuggestionsManagementActivity"
-            android:exported="false" />
+        <!-- ========================================= -->
+        <!-- ACTIVIDADES PRINCIPALES -->
+        <!-- ========================================= -->
 
-        <activity
-            android:name=".LoanManagementActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".BookManagementActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".UserManagementActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".AdminDashboardActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".ProfileActivity"
-            android:exported="false"
-            android:theme="@style/Theme.BiblioCloud.NoActionBar" />
-
-        <activity
-            android:name=".SuggestionsActivity"
-            android:exported="false"
-            android:theme="@style/Theme.BiblioCloud.NoActionBar" />
-
-        <activity
-            android:name=".FavoritesActivity"
-            android:exported="false"
-            android:theme="@style/Theme.BiblioCloud.NoActionBar" />
-
+        <!-- Login Activity -->
         <activity
             android:name=".LoginActivity"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.BiblioCloud.NoActionBar">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
+        <!-- Register Activity -->
+        <activity
+            android:name=".RegisterActivity"
+            android:theme="@style/Theme.BiblioCloud.NoActionBar"
+            android:exported="false"/>
+
+        <!-- Main Activity -->
         <activity
             android:name=".MainActivity"
-            android:exported="false" />
+            android:exported="false"/>
 
+        <!-- ========================================= -->
+        <!-- ACTIVIDADES DE USUARIO -->
+        <!-- ========================================= -->
+
+        <!-- Search Activity -->
         <activity
             android:name=".SearchActivity"
-            android:exported="false"
-            android:theme="@style/Theme.BiblioCloud.NoActionBar" />
+            android:exported="false"/>
 
-        <!-- ===== SERVICIO DE FIREBASE CLOUD MESSAGING ===== -->
+        <!-- Favorites Activity -->
+        <activity
+            android:name=".FavoritesActivity"
+            android:exported="false"/>
+
+        <!-- Profile Activity -->
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false"/>
+
+        <!-- Suggestions Activity -->
+        <activity
+            android:name=".SuggestionsActivity"
+            android:exported="false"/>
+
+        <!-- Map Activity -->
+        <activity
+            android:name=".MapActivity"
+            android:exported="false"/>
+
+        <!-- Biblioteca Detail Activity -->
+        <activity
+            android:name=".BibliotecaDetailActivity"
+            android:exported="false"/>
+
+        <!-- ========================================= -->
+        <!-- 🆕 NUEVAS ACTIVIDADES - SUCURSALES Y COMPRAS -->
+        <!-- ========================================= -->
+
+        <!-- Branch Books Catalog Activity (Usuario) -->
+        <activity
+            android:name=".BranchBooksCatalogActivity"
+            android:exported="false"/>
+
+        <!-- Purchase Activity -->
+        <activity
+            android:name=".PurchaseActivity"
+            android:exported="false"/>
+
+        <!-- My Purchases Activity -->
+        <activity
+            android:name=".MyPurchasesActivity"
+            android:exported="false"/>
+
+        <!-- ========================================= -->
+        <!-- ACTIVIDADES DE ADMINISTRADOR -->
+        <!-- ========================================= -->
+
+        <!-- Admin Dashboard -->
+        <activity
+            android:name=".AdminDashboardActivity"
+            android:exported="false"/>
+
+        <!-- User Management -->
+        <activity
+            android:name=".UserManagementActivity"
+            android:exported="false"/>
+
+        <!-- Book Management -->
+        <activity
+            android:name=".BookManagementActivity"
+            android:exported="false"/>
+
+        <!-- Loan Management -->
+        <activity
+            android:name=".LoanManagementActivity"
+            android:exported="false"/>
+
+        <!-- Suggestions Management -->
+        <activity
+            android:name=".SuggestionsManagementActivity"
+            android:exported="false"/>
+
+        <!-- 🆕 Branch Management (Admin) -->
+        <activity
+            android:name=".BranchManagementActivity"
+            android:exported="false"/>
+
+        <!-- 🆕 Branch Location Picker -->
+        <activity
+            android:name=".BranchLocationPickerActivity"
+            android:exported="false"/>
+
+        <!-- 🆕 Branch Books Management (Admin) -->
+        <activity
+            android:name=".BranchBooksActivity"
+            android:exported="false"/>
+
+        <!-- 🆕 Admin Purchases Management -->
+        <activity
+            android:name=".AdminPurchasesActivity"
+            android:exported="false"/>
+
+        <!-- ========================================= -->
+        <!-- SERVICIOS -->
+        <!-- ========================================= -->
+
+        <!-- Firebase Cloud Messaging Service -->
         <service
-            android:name=".services.FirebaseMessagingService"
+            android:name=".services.MyFirebaseMessagingService"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
-
-        <!-- ===== CLAVE DE GOOGLE MAPS ===== -->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBTzm4kVIIjfgJoxYrOZmKze8vhLtpZhR4" />
 
     </application>
 

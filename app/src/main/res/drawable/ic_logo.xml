@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+
+    <!-- Fondo circular -->
+    <path
+        android:fillColor="#8B4513"
+        android:pathData="M60,10
+                         A50,50 0 1,1 60,110
+                         A50,50 0 1,1 60,10Z"/>
+
+    <!-- Libro abierto -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M35,40 L35,80 L58,75 L58,35 Z"/>
+
+    <path
+        android:fillColor="#F5F5DC"
+        android:pathData="M62,35 L62,75 L85,80 L85,40 Z"/>
+
+    <!-- Líneas del libro -->
+    <path
+        android:strokeColor="#8B4513"
+        android:strokeWidth="1"
+        android:pathData="M40,50 L53,48 M40,55 L53,53 M40,60 L53,58 M40,65 L53,63"/>
+
+    <path
+        android:strokeColor="#8B4513"
+        android:strokeWidth="1"
+        android:pathData="M67,48 L80,50 M67,53 L80,55 M67,58 L80,60 M67,63 L80,65"/>
+
+    <!-- Marca de página -->
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M60,30 L60,75 L65,70 L70,75 L70,30 Z"/>
+</vector>

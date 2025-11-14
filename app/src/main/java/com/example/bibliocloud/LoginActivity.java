@@ -1,4 +1,3 @@
-// LoginActivity.java
 package com.example.bibliocloud;
 
 import android.content.Intent;
@@ -17,11 +16,10 @@ import com.google.firebase.auth.FirebaseUser;
 public class LoginActivity extends AppCompatActivity {
 
     private TextInputEditText etEmail, etPassword;
-    private MaterialButton btnLogin;
+    private MaterialButton btnLogin, btnGoToRegister;
 
-    private FirebaseAuth mAuth; // 🔹 Autenticación Firebase
+    private FirebaseAuth mAuth;
 
-    // 🔹 Definimos un administrador por correo (también puede controlarse por Firestore)
     private final String ADMIN_EMAIL = "admin@bibliocloud.com";
 
     @Override
@@ -29,28 +27,28 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Inicializar FirebaseAuth
         mAuth = FirebaseAuth.getInstance();
 
-        // Inicializar vistas
         initializeViews();
-
-        // Configurar botón de login
         setupLoginButton();
+        setupRegisterButton();
     }
 
     private void initializeViews() {
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
+        btnGoToRegister = findViewById(R.id.btnGoToRegister); // <-- CORRECTO
     }
 
     private void setupLoginButton() {
-        btnLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                attemptLogin();
-            }
+        btnLogin.setOnClickListener(v -> attemptLogin());
+    }
+
+    private void setupRegisterButton() {
+        btnGoToRegister.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+            startActivity(intent);
         });
     }
 
@@ -60,7 +58,6 @@ public class LoginActivity extends AppCompatActivity {
 
         if (!validateInputs(email, password)) return;
 
-        // 🔹 Iniciar sesión con Firebase
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
@@ -86,11 +83,9 @@ public class LoginActivity extends AppCompatActivity {
         Intent intent;
 
         if (email.equalsIgnoreCase(ADMIN_EMAIL)) {
-            // 🔹 Redirigir al dashboard de administrador
             intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
             Toast.makeText(this, "Bienvenido Administrador", Toast.LENGTH_SHORT).show();
         } else {
-            // 🔹 Redirigir al dashboard de usuario
             intent = new Intent(LoginActivity.this, MainActivity.class);
             intent.putExtra("USER_EMAIL", email);
             Toast.makeText(this, "Bienvenido " + email, Toast.LENGTH_SHORT).show();
@@ -108,10 +103,10 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        // 🔹 Si el usuario ya está autenticado, lo redirigimos directamente
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             redirectToAppropriateActivity(currentUser.getEmail());
         }
     }
 }
+

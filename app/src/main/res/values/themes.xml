@@ -1,8 +1,14 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
-    <style name="Base.Theme.Bibliocloud" parent="Theme.Material3.DayNight.NoActionBar">
-
+    <!-- Tema base -->
+    <style name="Theme.BiblioCloud" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Aquí tus colores y configuraciones -->
     </style>
 
-    <style name="Theme.Bibliocloud" parent="Base.Theme.Bibliocloud" />
+    <!-- Tema sin barra de acción (EL QUE FALTA) -->
+    <style name="Theme.BiblioCloud.NoActionBar" parent="Theme.BiblioCloud">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
 </resources>

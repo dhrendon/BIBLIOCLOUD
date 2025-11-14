@@ -1,28 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
-    <style name="Base.Theme.BiblioCloud" parent="Theme.MaterialComponents.Light.DarkActionBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/dark_brown</item>
-        <item name="colorOnPrimary">@color/white</item>
-        <item name="colorSecondary">@color/accent_brown</item>
-        <item name="colorOnSecondary">@color/white</item>
-        <item name="android:windowBackground">@color/colorBackground</item>
-        <item name="android:statusBarColor">@color/dark_brown</item>
-    </style>
+    <!-- Secciones de Anaqueles -->
+    <string-array name="shelf_sections">
+        <item>Literatura</item>
+        <item>Ciencia Ficción</item>
+        <item>Historia</item>
+        <item>Biografía</item>
+        <item>Infantil</item>
+        <item>Referencia</item>
+        <item>Novela</item>
+        <item>Poesía</item>
+        <item>Ensayo</item>
+        <item>Romance</item>
+        <item>Misterio</item>
+        <item>Terror</item>
+    </string-array>
 
+    <!-- Estados de Libros -->
+    <string-array name="book_status">
+        <item>Disponible</item>
+        <item>Prestado</item>
+        <item>Reservado</item>
+        <item>En reparación</item>
+        <item>Extraviado</item>
+    </string-array>
 
-    <style name="Base.Theme.BiblioCloud.NoActionBar" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/dark_brown</item>
-        <item name="colorOnPrimary">@color/white</item>
-        <item name="colorSecondary">@color/accent_brown</item>
-        <item name="colorOnSecondary">@color/white</item>
-        <item name="android:windowBackground">@color/colorBackground</item>
-        <item name="android:statusBarColor">@color/dark_brown</item>
-    </style>
+    <!-- Condiciones de Libros -->
+    <string-array name="book_conditions">
+        <item>Nuevo</item>
+        <item>Excelente estado</item>
+        <item>Buen estado</item>
+        <item>Estado regular</item>
+        <item>Estado pobre</item>
+    </string-array>
 
+    <!-- Estados de Órdenes -->
+    <string-array name="order_status">
+        <item>Todas</item>
+        <item>Pendiente</item>
+        <item>Procesando</item>
+        <item>Enviado</item>
+        <item>Entregado</item>
+        <item>Cancelado</item>
+    </string-array>
 
-    <style name="Theme.BiblioCloud" parent="Base.Theme.BiblioCloud" />
-    <style name="Theme.BiblioCloud.NoActionBar" parent="Base.Theme.BiblioCloud.NoActionBar" />
+    <!-- Métodos de Pago -->
+    <string-array name="payment_methods">
+        <item>Tarjeta de Crédito/Débito</item>
+        <item>PayPal</item>
+        <item>Efectivo</item>
+        <item>Transferencia Bancaria</item>
+        <item>Mercado Pago</item>
+    </string-array>
+
+    <!-- Cantidades para Spinner -->
+    <string-array name="quantities">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+
+    <!-- Niveles de Anaquel -->
+    <string-array name="shelf_levels">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+
+    <!-- Estados de Sucursales -->
+    <string-array name="branch_status">
+        <item>Activa</item>
+        <item>Inactiva</item>
+        <item>En mantenimiento</item>
+    </string-array>
+
+    <!-- Horarios típicos -->
+    <string-array name="typical_schedules">
+        <item>Lun-Vie: 9:00-20:00, Sáb: 10:00-14:00</item>
+        <item>Lun-Vie: 8:00-18:00, Sáb: 9:00-13:00</item>
+        <item>Lun-Dom: 9:00-21:00</item>
+        <item>Lun-Sáb: 10:00-19:00</item>
+        <item>24 horas</item>
+    </string-array>
 </resources>
