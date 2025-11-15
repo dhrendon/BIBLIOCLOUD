@@ -20,7 +20,7 @@ public class BookRepository {
 
     public BookRepository() {
         db = FirebaseFirestore.getInstance();
-        booksRef = db.collection("books");
+        booksRef = db.collection("libros"); // 👈 CORREGIDO
         storageRef = FirebaseStorage.getInstance().getReference();
     }
 
@@ -35,13 +35,16 @@ public class BookRepository {
         // Convertir a Map para mejor control
         Map<String, Object> bookData = new HashMap<>();
         bookData.put("id", book.getId());
-        bookData.put("title", book.getTitle());
-        bookData.put("author", book.getAuthor());
-        bookData.put("category", book.getCategory());
-        bookData.put("year", book.getYear());
-        bookData.put("status", book.getStatus());
+
+        // Usa los @PropertyName del modelo Book.java
+        // 'title' en Java se guardará como 'titulo' en Firestore
+        bookData.put("titulo", book.getTitle());
+        bookData.put("autor", book.getAuthor());
+        bookData.put("categoria", book.getCategory());
+        bookData.put("anio", book.getYear());
+        bookData.put("estado", book.getStatus());
         bookData.put("isFavorite", book.isFavorite());
-        bookData.put("imageUrl", book.getFotoBase64() != null ? book.getFotoBase64() : "");
+        bookData.put("foto", book.getFotoBase64() != null ? book.getFotoBase64() : ""); // Usa 'foto'
         bookData.put("rating", book.getRating());
         bookData.put("ratingCount", book.getRatingCount());
         bookData.put("createdAt", System.currentTimeMillis());
@@ -58,13 +61,14 @@ public class BookRepository {
                 });
     }
 
-    // MÉTODO ALTERNATIVO: Usando el objeto directamente
+    // MÉTODO ALTERNATIVO: Usando el objeto directamente (Recomendado)
     public void addBookDirect(Book book, OnCompleteListener listener) {
         String bookId = booksRef.document().getId();
         book.setId(bookId);
 
         Log.d(TAG, "Guardando libro (método directo): " + book.getTitle());
 
+        // Firestore usará los @PropertyName del modelo Book.java
         booksRef.document(bookId)
                 .set(book)  // Firebase convierte automáticamente
                 .addOnSuccessListener(aVoid -> {
@@ -81,7 +85,7 @@ public class BookRepository {
     public void getAllBooks(OnBooksLoadedListener listener) {
         Log.d(TAG, "Cargando todos los libros...");
 
-        booksRef.orderBy("title", Query.Direction.ASCENDING)
+        booksRef.orderBy("titulo", Query.Direction.ASCENDING) // Ordenar por 'titulo'
                 .addSnapshotListener((value, error) -> {
                     if (error != null) {
                         Log.e(TAG, "✗ Error al cargar libros: " + error.getMessage(), error);
@@ -104,8 +108,8 @@ public class BookRepository {
     public void getBooksByCategory(String category, OnBooksLoadedListener listener) {
         Log.d(TAG, "Buscando libros en categoría: " + category);
 
-        booksRef.whereEqualTo("category", category)
-                .orderBy("title", Query.Direction.ASCENDING)
+        booksRef.whereEqualTo("categoria", category) // Usar 'categoria'
+                .orderBy("titulo", Query.Direction.ASCENDING) // Usar 'titulo'
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     Log.d(TAG, "✓ Encontrados " + querySnapshot.size() + " libros");
@@ -121,7 +125,7 @@ public class BookRepository {
     public void getBooksByStatus(String status, OnBooksLoadedListener listener) {
         Log.d(TAG, "Buscando libros con estado: " + status);
 
-        booksRef.whereEqualTo("status", status)
+        booksRef.whereEqualTo("estado", status) // Usar 'estado'
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     Log.d(TAG, "✓ Encontrados " + querySnapshot.size() + " libros");
@@ -137,7 +141,7 @@ public class BookRepository {
     public void searchBooks(String searchText, OnBooksLoadedListener listener) {
         Log.d(TAG, "Buscando: " + searchText);
 
-        booksRef.orderBy("title")
+        booksRef.orderBy("titulo") // Usar 'titulo'
                 .startAt(searchText)
                 .endAt(searchText + "\uf8ff")
                 .get()
@@ -156,7 +160,7 @@ public class BookRepository {
         Log.d(TAG, "Actualizando libro: " + book.getId());
 
         booksRef.document(book.getId())
-                .set(book)
+                .set(book) // Usar el objeto (respeta @PropertyName)
                 .addOnSuccessListener(aVoid -> {
                     Log.d(TAG, "✓ Libro actualizado");
                     listener.onSuccess(book.getId());
@@ -188,7 +192,7 @@ public class BookRepository {
         Log.d(TAG, "Actualizando estado del libro: " + bookId + " -> " + status);
 
         booksRef.document(bookId)
-                .update("status", status)
+                .update("estado", status) // Usar 'estado'
                 .addOnSuccessListener(aVoid -> {
                     Log.d(TAG, "✓ Estado actualizado");
                     listener.onSuccess(bookId);
@@ -204,7 +208,7 @@ public class BookRepository {
         Log.d(TAG, "Marcando favorito: " + bookId + " = " + isFavorite);
 
         booksRef.document(bookId)
-                .update("favorite", isFavorite)
+                .update("favorite", isFavorite) // 'favorite' no está en tu @PropertyName
                 .addOnSuccessListener(aVoid -> {
                     Log.d(TAG, "✓ Favorito actualizado");
                     listener.onSuccess(bookId);
@@ -225,7 +229,14 @@ public class BookRepository {
                     Book book = documentSnapshot.toObject(Book.class);
                     if (book != null) {
                         book.addRating(rating);
-                        updateBook(book, listener);
+                        // Actualizar los campos 'rating' y 'ratingCount'
+                        Map<String, Object> updates = new HashMap<>();
+                        updates.put("rating", book.getRating());
+                        updates.put("ratingCount", book.getRatingCount());
+
+                        booksRef.document(bookId).update(updates)
+                                .addOnSuccessListener(aVoid -> listener.onSuccess(bookId))
+                                .addOnFailureListener(listener::onFailure);
                     } else {
                         Log.e(TAG, "✗ Libro no encontrado");
                         listener.onFailure(new Exception("Libro no encontrado"));

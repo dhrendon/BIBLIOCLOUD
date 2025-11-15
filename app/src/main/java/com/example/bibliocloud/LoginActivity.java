@@ -1,17 +1,19 @@
 package com.example.bibliocloud;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
+import android.util.Log;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-
+import com.example.bibliocloud.models.User;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -19,8 +21,7 @@ public class LoginActivity extends AppCompatActivity {
     private MaterialButton btnLogin, btnGoToRegister;
 
     private FirebaseAuth mAuth;
-
-    private final String ADMIN_EMAIL = "admin@bibliocloud.com";
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +29,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         initializeViews();
         setupLoginButton();
@@ -38,7 +40,7 @@ public class LoginActivity extends AppCompatActivity {
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
-        btnGoToRegister = findViewById(R.id.btnGoToRegister); // <-- CORRECTO
+        btnGoToRegister = findViewById(R.id.btnGoToRegister);
     }
 
     private void setupLoginButton() {
@@ -58,17 +60,126 @@ public class LoginActivity extends AppCompatActivity {
 
         if (!validateInputs(email, password)) return;
 
+        btnLogin.setEnabled(false);
+        btnLogin.setText("Iniciando sesión...");
+
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
                         if (user != null) {
-                            redirectToAppropriateActivity(user.getEmail());
+                            loadUserDataAndRedirect(user.getUid(), email);
                         }
                     } else {
-                        showError("Credenciales incorrectas o usuario no registrado");
+                        btnLogin.setEnabled(true);
+                        btnLogin.setText("Iniciar Sesión");
+                        showError("Credenciales incorrectas");
                     }
                 });
+    }
+
+    private void loadUserDataAndRedirect(String userId, String email) {
+        db.collection("usuarios").document(userId)
+                .get()
+                .addOnSuccessListener(document -> {
+                    if (document.exists()) {
+                        Log.d("LOGIN_DEBUG", "Documento existe");
+
+                        // 🔥 Leer campos en español directamente
+                        String rol = document.getString("rol");
+                        String nombre = document.getString("nombre");
+                        String correo = document.getString("correo");
+                        String telefono = document.getString("telefono");
+                        String direccion = document.getString("direccion");
+                        String idSucursal = document.getString("id_sucursal");
+                        String nombreSucursal = document.getString("nombre_sucursal");
+
+                        Log.d("LOGIN_DEBUG", "rol: " + rol);
+                        Log.d("LOGIN_DEBUG", "nombre: " + nombre);
+
+                        // Crear objeto User manualmente
+                        User user = new User(userId, nombre, correo, rol);
+                        user.setPhone(telefono);
+                        user.setDepartment(direccion);
+                        user.setBranchId(idSucursal);
+                        user.setBranchName(nombreSucursal);
+
+                        Log.d("LOGIN_DEBUG", "isAdmin: " + user.isAdmin());
+                        Log.d("LOGIN_DEBUG", "isCashier: " + user.isCashier());
+
+                        saveUserInfo(user);
+                        redirectByUserType(user);
+                    } else {
+                        Log.d("LOGIN_DEBUG", "Documento no existe, creando usuario por defecto");
+                        createDefaultUserAndRedirect(userId, email);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    btnLogin.setEnabled(true);
+                    btnLogin.setText("Iniciar Sesión");
+                    Log.e("LOGIN_DEBUG", "Error: " + e.getMessage());
+                    showError("Error al cargar datos del usuario");
+                });
+    }
+
+    private void createDefaultUserAndRedirect(String userId, String email) {
+        User user = new User(userId, "Usuario", email, User.ROLE_USER);
+
+        db.collection("usuarios").document(userId)
+                .set(user)
+                .addOnSuccessListener(aVoid -> {
+                    saveUserInfo(user);
+                    redirectByUserType(user);
+                })
+                .addOnFailureListener(e -> {
+                    btnLogin.setEnabled(true);
+                    btnLogin.setText("Iniciar Sesión");
+                    showError("Error al crear perfil de usuario");
+                });
+    }
+
+    private void saveUserInfo(User user) {
+        SharedPreferences prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("current_user_id", user.getId());
+        editor.putString("current_user_name", user.getName());
+        editor.putString("current_user_email", user.getEmail());
+        editor.putString("user_type", user.getUserType());
+        editor.putBoolean("is_admin", user.isAdmin());
+        editor.putBoolean("is_cashier", user.isCashier());
+
+        if (user.isCashier()) {
+            editor.putString("branch_id", user.getBranchId() != null ? user.getBranchId() : "");
+            editor.putString("branch_name", user.getBranchName() != null ? user.getBranchName() : "");
+        }
+
+        editor.apply();
+    }
+
+    private void redirectByUserType(User user) {
+        Intent intent;
+        String welcomeMessage;
+
+        if (user.isAdmin()) {
+            intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
+            welcomeMessage = "Bienvenido Administrador";
+            Log.d("LOGIN_DEBUG", "Redirigiendo a AdminDashboardActivity");
+        } else if (user.isCashier()) {
+            intent = new Intent(LoginActivity.this, CashierDashboardActivity.class);
+            welcomeMessage = "Bienvenido Cajero " + user.getName();
+            Log.d("LOGIN_DEBUG", "Redirigiendo a CashierDashboardActivity");
+        } else {
+            intent = new Intent(LoginActivity.this, MainActivity.class);
+            intent.putExtra("USER_EMAIL", user.getEmail());
+            welcomeMessage = "Bienvenido " + user.getName();
+            Log.d("LOGIN_DEBUG", "Redirigiendo a MainActivity");
+        }
+
+        intent.putExtra("IS_ADMIN", user.isAdmin());
+        Toast.makeText(this, welcomeMessage, Toast.LENGTH_SHORT).show();
+
+        startActivity(intent);
+        finish();
     }
 
     private boolean validateInputs(String email, String password) {
@@ -77,23 +188,6 @@ public class LoginActivity extends AppCompatActivity {
             return false;
         }
         return true;
-    }
-
-    private void redirectToAppropriateActivity(String email) {
-        Intent intent;
-
-        if (email.equalsIgnoreCase(ADMIN_EMAIL)) {
-            intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
-            Toast.makeText(this, "Bienvenido Administrador", Toast.LENGTH_SHORT).show();
-        } else {
-            intent = new Intent(LoginActivity.this, MainActivity.class);
-            intent.putExtra("USER_EMAIL", email);
-            Toast.makeText(this, "Bienvenido " + email, Toast.LENGTH_SHORT).show();
-        }
-
-        intent.putExtra("IS_ADMIN", email.equalsIgnoreCase(ADMIN_EMAIL));
-        startActivity(intent);
-        finish();
     }
 
     private void showError(String message) {
@@ -105,8 +199,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
-            redirectToAppropriateActivity(currentUser.getEmail());
+            loadUserDataAndRedirect(currentUser.getUid(), currentUser.getEmail());
         }
     }
 }
-

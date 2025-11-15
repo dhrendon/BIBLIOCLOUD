@@ -3,162 +3,210 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
-    android:background="@color/colorBackground">
+    android:fillViewport="true"
+    android:isScrollContainer="true"
+    android:descendantFocusability="afterDescendants"
+    android:background="@color/colorBackground"
+    android:padding="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <!-- Header -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Gestión de Usuarios"
+            android:text="@string/gestion_usuarios"
             android:textSize="24sp"
             android:textStyle="bold"
+            android:textColor="@color/colorPrimary"
             android:gravity="center"
-            android:layout_marginBottom="24dp"
-            android:textColor="@color/colorTextPrimary" />
+            android:layout_marginBottom="24dp" />
 
-        <!-- Formulario de Registro -->
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Registrar Nuevo Usuario"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp"
-            android:textColor="@color/colorTextPrimary" />
+            android:orientation="vertical"
+            android:background="@color/light_brown"
+            android:padding="16dp"
+            android:layout_marginBottom="18dp"
+            android:elevation="4dp">
 
-        <!-- Nombre -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            app:boxBackgroundColor="@color/white">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etNombre"
+            <TextView
+                android:id="@+id/tvTotalUsers"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Nombre completo *"
-                android:textColorHint="@color/colorTextSecondary" />
+                android:text="@string/usuarios_count"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:padding="4dp"/>
 
-        </com.google.android.material.textfield.TextInputLayout>
+            <TextView
+                android:id="@+id/tvTotalCashiers"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/cajeros_count"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:padding="4dp"/>
 
-        <!-- Email -->
+            <TextView
+                android:id="@+id/tvTotalAdmins"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/administradores_count"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:padding="4dp"/>
+        </LinearLayout>
+
+        <!-- FORMULARIO DE CREACIÓN (ADMIN -> CAJERO) -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            app:boxBackgroundColor="@color/white">
+            android:hint="@string/nombre_completo">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/correo_electronico"
+            android:layout_marginTop="8dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Email *"
-                android:inputType="textEmailAddress"
-                android:textColorHint="@color/colorTextSecondary" />
-
+                android:inputType="textEmailAddress" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Contraseña -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            app:boxBackgroundColor="@color/white">
+            android:hint="@string/contraseña"
+            android:layout_marginTop="8dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Contraseña *"
-                android:inputType="textPassword"
-                android:textColorHint="@color/colorTextSecondary" />
-
+                android:inputType="textPassword" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Teléfono -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            app:boxBackgroundColor="@color/white">
+            android:hint="@string/confirmar_contraseña"
+            android:layout_marginTop="8dp">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etTelefono"
+                android:id="@+id/etConfirmPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Teléfono *"
-                android:inputType="phone"
-                android:textColorHint="@color/colorTextSecondary" />
-
+                android:inputType="textPassword" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Dirección -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:boxBackgroundColor="@color/white">
+            android:hint="@string/telefono"
+            android:layout_marginTop="8dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etPhone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="phone" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/direccion"
+            android:layout_marginTop="8dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etDireccion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Dirección"
-                android:inputType="textPostalAddress"
-                android:textColorHint="@color/colorTextSecondary" />
-
+                android:inputType="textPostalAddress" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Botón Registrar -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnRegistrarUsuario"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text=" Registrar Usuario"
-            android:layout_marginBottom="24dp"
-            android:backgroundTint="@color/colorPrimary"
-            android:textColor="@color/white" />
-
-        <!-- Separador -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/light_brown"
-            android:layout_marginBottom="16dp" />
-
-        <!-- Lista de Usuarios -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Usuarios Registrados"
-            android:textSize="18sp"
+            android:text="@string/tipo_usuario"
             android:textStyle="bold"
-            android:layout_marginBottom="16dp"
-            android:textColor="@color/colorTextPrimary" />
+            android:layout_marginTop="12dp"/>
 
+        <Spinner
+            android:id="@+id/spinnerUserType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/light_brown"
+            android:layout_marginTop="6dp" />
+
+        <LinearLayout
+            android:id="@+id/layoutBranchSelector"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_marginTop="12dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/sucursal"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp"/>
+
+            <Spinner
+                android:id="@+id/spinnerBranch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/light_brown"/>
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/checkboxTerms"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/acepto_terminos"
+            android:layout_marginTop="12dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRegister"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/registrar_usuario"
+            android:layout_marginTop="16dp"
+            android:textColor="@color/white"
+            app:backgroundTint="@color/colorPrimary" />
+
+        <!-- Lista de usuarios (tarjetas) -->
         <LinearLayout
             android:id="@+id/layoutListaUsuarios"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginTop="24dp" />
 
-        <!-- Botón Volver -->
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnVolver"
+            android:id="@+id/btnGoToLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="⬅ Volver al Dashboard"
-            android:backgroundTint="@color/accent_brown"
-            android:textColor="@color/white" />
+            android:text="@string/volver"
+            android:layout_marginTop="16dp"
+            android:textColor="@color/white"
+            app:backgroundTint="@color/accent_brown" />
 
     </LinearLayout>
-
 </ScrollView>

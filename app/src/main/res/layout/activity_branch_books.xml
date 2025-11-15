@@ -11,7 +11,6 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Encabezado -->
         <TextView
             android:id="@+id/tvBranchName"
             android:layout_width="match_parent"
@@ -33,7 +32,6 @@
             android:gravity="center"
             android:layout_marginBottom="24dp"/>
 
-        <!-- Formulario -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -57,7 +55,6 @@
                     android:textColor="@color/colorPrimary"
                     android:layout_marginBottom="16dp"/>
 
-                <!-- Selector de libro -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -73,7 +70,6 @@
                     android:padding="12dp"
                     android:background="@color/light_brown"/>
 
-                <!-- Ubicación física -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -125,7 +121,6 @@
                         android:text="1"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Stock -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -155,7 +150,6 @@
                     android:text="Disponible en formato digital"
                     android:layout_marginBottom="16dp"/>
 
-                <!-- Precios -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -209,7 +203,6 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Lista de inventario -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -225,14 +218,13 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"/>
 
-        <!-- Botón volver -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnBack"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Volver"
             android:layout_marginTop="16dp"
-            app:backgroundTint="@color/colorTextSecondary"/>
+            app:backgroundTint="@color/accent_brown"/>
 
     </LinearLayout>
 </ScrollView>

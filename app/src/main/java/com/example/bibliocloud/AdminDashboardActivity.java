@@ -10,13 +10,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class AdminDashboardActivity extends AppCompatActivity {
+public class
+AdminDashboardActivity extends AppCompatActivity {
 
     private Button btnGestionUsuarios, btnGestionLibros, btnGestionPrestamos,
             btnSugerencias, btnGestionSucursales, btnGestionCompras, btnCerrarSesion;
     private TextView tvTotalLibros, tvTotalUsuarios, tvTotalPrestamos,
             tvTotalSucursales, tvTotalCompras;
-
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
 
@@ -174,7 +174,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
             finish();
         }
     }
-
     @Override
     protected void onResume() {
         super.onResume();

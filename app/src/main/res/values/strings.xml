@@ -94,6 +94,25 @@
     <string name="confirm_delete">¿Estás seguro de eliminar este elemento?</string>
     <string name="no_items_found">No se encontraron elementos</string>
 
+    <string name="nombre_completo">Nombre Completo</string>
+    <string name="correo_electronico">Correo electrónico</string>
+    <string name="rol">Rol</string>
+    <string name="sucursal">Sucursal</string>
+    <string name="guardar_cambios">Guardar cambios</string>
+
+    <string name="gestion_usuarios">Gestión de Usuarios</string>
+    <string name="usuarios_count">Usuarios: 0</string>
+    <string name="cajeros_count">Cajeros: 0</string>
+    <string name="administradores_count">Administradores: 0</string>
+    <string name="contraseña">Contraseña</string>
+    <string name="confirmar_contraseña">Confirmar contraseña</string>
+    <string name="telefono">Teléfono</string>
+    <string name="direccion">Dirección</string>
+    <string name="tipo_usuario">Tipo de usuario</string>
+    <string name="acepto_terminos">Acepto los términos y condiciones</string>
+    <string name="registrar_usuario">Registrar Usuario</string>
+    <string name="volver">Volver</string>
+
     <!-- Common -->
     <string name="back">Volver</string>
     <string name="cancel">Cancelar</string>

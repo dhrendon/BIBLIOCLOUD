@@ -1,6 +1,5 @@
 package com.example.bibliocloud;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -12,8 +11,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
 import com.example.bibliocloud.models.User;
-import com.google.gson.Gson;
+import com.example.bibliocloud.repositories.UserRepository; // 👈 IMPORTANTE
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -24,6 +26,8 @@ public class ProfileActivity extends AppCompatActivity {
     private LinearLayout layoutEdit, layoutView;
 
     private User currentUser;
+    private UserRepository userRepository; // 👈 AÑADIDO
+    private FirebaseAuth mAuth;
     private boolean isEditing = false;
 
     @Override
@@ -31,9 +35,13 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
+        // Instanciar repositorio y Auth
+        userRepository = new UserRepository();
+        mAuth = FirebaseAuth.getInstance();
+
         initializeViews();
         setupToolbar();
-        loadUserData();
+        loadUserData(); // 👈 MODIFICADO
         setupListeners();
         refreshUI();
     }
@@ -71,41 +79,70 @@ public class ProfileActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(v -> finish());
     }
 
-    private void loadUserData() {
-        SharedPreferences prefs = getSharedPreferences("UserData", MODE_PRIVATE);
-        String userJson = prefs.getString("current_user", "");
+    // --- LÓGICA DE DATOS MODIFICADA ---
 
-        if (!userJson.isEmpty()) {
-            Gson gson = new Gson();
-            currentUser = gson.fromJson(userJson, User.class);
-        } else {
-            // Crear usuario por defecto
-            createDefaultUser();
+    private void loadUserData() {
+        FirebaseUser fUser = mAuth.getCurrentUser();
+        if (fUser == null) {
+            Toast.makeText(this, "No se pudo cargar el usuario", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
         }
 
-        // Cargar estadísticas
-        loadUserStatistics();
+        // Usar el repositorio para cargar el usuario desde Firestore
+        userRepository.getUserById(fUser.getUid(), new UserRepository.OnUserLoadedListener() {
+            @Override
+            public void onUserLoaded(User user) {
+                currentUser = user;
+                refreshUI(); // Mostrar los datos cargados
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(ProfileActivity.this, "Error al cargar perfil: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-    private void createDefaultUser() {
-        SharedPreferences prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
-        String userEmail = prefs.getString("current_user_email", "usuario@bibliocloud.com");
-        boolean isAdmin = prefs.getBoolean("is_admin", false);
+    private void saveProfile() {
+        if (currentUser == null) {
+            Toast.makeText(this, "Error: No hay datos de usuario para guardar", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        currentUser = new User(
-                "user_1",
-                "Usuario BiblioCloud",
-                userEmail,
-                isAdmin ? "admin" : "user"
-        );
-        saveUserData();
+        String name = etName.getText().toString().trim();
+        String phone = etPhone.getText().toString().trim();
+        String department = etDepartment.getText().toString().trim();
+
+        if (name.isEmpty()) {
+            etName.setError("Ingresa tu nombre");
+            return;
+        }
+
+        // Actualizar el objeto currentUser en memoria
+        currentUser.setName(name);
+        currentUser.setPhone(phone);
+        currentUser.setDepartment(department);
+        // (El switch de notificaciones se actualiza solo gracias al listener)
+
+        // Guardar cambios en Firestore usando el repositorio
+        userRepository.updateUser(currentUser, new UserRepository.OnCompleteListener() {
+            @Override
+            public void onSuccess(String id) {
+                Toast.makeText(ProfileActivity.this, "Perfil actualizado correctamente", Toast.LENGTH_SHORT).show();
+                isEditing = false; // Salir del modo edición
+                refreshUI();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(ProfileActivity.this, "Error al guardar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-    private void loadUserStatistics() {
-        SharedPreferences prefs = getSharedPreferences("UserStats", MODE_PRIVATE);
-        currentUser.setBooksBorrowed(prefs.getInt("books_borrowed", 0));
-        currentUser.setSuggestionsMade(prefs.getInt("suggestions_made", 0));
-    }
+    // --- FIN LÓGICA DE DATOS MODIFICADA ---
+
 
     private void setupListeners() {
         btnSaveProfile.setOnClickListener(v -> saveProfile());
@@ -114,7 +151,9 @@ public class ProfileActivity extends AppCompatActivity {
         switchNotifications.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                currentUser.setNotificationsEnabled(isChecked);
+                if (currentUser != null) {
+                    currentUser.setNotificationsEnabled(isChecked);
+                }
             }
         });
 
@@ -133,6 +172,8 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void refreshUI() {
+        if (currentUser == null) return; // No hacer nada si el usuario aún no se ha cargado
+
         if (isEditing) {
             // Modo edición
             layoutView.setVisibility(View.GONE);
@@ -147,68 +188,32 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void populateViewFields() {
-        if (currentUser != null) {
-            tvUserName.setText(currentUser.getName());
-            tvUserEmail.setText(currentUser.getEmail());
-            tvUserType.setText(currentUser.getFormattedUserType());
-            tvBooksBorrowed.setText(String.valueOf(currentUser.getBooksBorrowed()));
-            tvSuggestionsMade.setText(String.valueOf(currentUser.getSuggestionsMade()));
-        }
+        tvUserName.setText(currentUser.getName());
+        tvUserEmail.setText(currentUser.getEmail());
+        tvUserType.setText(currentUser.getFormattedUserType());
+        tvBooksBorrowed.setText(String.valueOf(currentUser.getBooksBorrowed()));
+        tvSuggestionsMade.setText(String.valueOf(currentUser.getSuggestionsMade()));
     }
 
     private void populateEditFields() {
-        if (currentUser != null) {
-            etName.setText(currentUser.getName());
-            etPhone.setText(currentUser.getPhone());
-            etDepartment.setText(currentUser.getDepartment());
-            switchNotifications.setChecked(currentUser.isNotificationsEnabled());
-        }
-    }
-
-    private void saveProfile() {
-        String name = etName.getText().toString().trim();
-        String phone = etPhone.getText().toString().trim();
-        String department = etDepartment.getText().toString().trim();
-
-        if (name.isEmpty()) {
-            etName.setError("Ingresa tu nombre");
-            return;
-        }
-
-        // Actualizar usuario
-        currentUser.setName(name);
-        currentUser.setPhone(phone);
-        currentUser.setDepartment(department);
-
-        // Guardar cambios
-        saveUserData();
-
-        // Salir del modo edición
-        isEditing = false;
-        refreshUI();
-
-        Toast.makeText(this, "Perfil actualizado correctamente", Toast.LENGTH_SHORT).show();
+        etName.setText(currentUser.getName());
+        etPhone.setText(currentUser.getPhone());
+        etDepartment.setText(currentUser.getDepartment());
+        switchNotifications.setChecked(currentUser.isNotificationsEnabled());
     }
 
     private void changePassword() {
-        // Por ahora solo un mensaje - luego implementaremos cambio real de contraseña
         Toast.makeText(this, "Función de cambio de contraseña - Próximamente", Toast.LENGTH_SHORT).show();
-    }
-
-    private void saveUserData() {
-        SharedPreferences prefs = getSharedPreferences("UserData", MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-
-        Gson gson = new Gson();
-        String userJson = gson.toJson(currentUser);
-        editor.putString("current_user", userJson);
-        editor.apply();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        loadUserStatistics();
-        refreshUI();
+        // Recargar datos por si acaso, aunque la carga inicial en onCreate es usualmente suficiente
+        if (currentUser == null) {
+            loadUserData();
+        } else {
+            refreshUI();
+        }
     }
 }

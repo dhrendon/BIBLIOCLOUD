@@ -10,7 +10,8 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28"/>
 
     <uses-feature
@@ -39,10 +40,9 @@
             android:value="@integer/google_play_services_version"/>
 
         <!-- ========================================= -->
-        <!-- ACTIVIDADES PRINCIPALES -->
+        <!-- ACTIVIDAD PRINCIPAL -->
         <!-- ========================================= -->
 
-        <!-- Login Activity -->
         <activity
             android:name=".LoginActivity"
             android:exported="true"
@@ -53,124 +53,62 @@
             </intent-filter>
         </activity>
 
-        <!-- Register Activity -->
+        <!-- Registro -->
         <activity
             android:name=".RegisterActivity"
             android:theme="@style/Theme.BiblioCloud.NoActionBar"
             android:exported="false"/>
 
-        <!-- Main Activity -->
-        <activity
-            android:name=".MainActivity"
-            android:exported="false"/>
+        <!-- Home Usuario -->
+        <activity android:name=".MainActivity" android:exported="false"/>
 
         <!-- ========================================= -->
-        <!-- ACTIVIDADES DE USUARIO -->
+        <!-- ACTIVIDADES DE ADMIN -->
         <!-- ========================================= -->
 
-        <!-- Search Activity -->
-        <activity
-            android:name=".SearchActivity"
-            android:exported="false"/>
+        <activity android:name=".AdminDashboardActivity" android:exported="false"/>
+        <activity android:name=".UserManagementActivity" android:exported="false"/>
 
-        <!-- Favorites Activity -->
+        <!-- 🆕 AGREGAR AQUÍ UserEditActivity -->
         <activity
-            android:name=".FavoritesActivity"
-            android:exported="false"/>
+            android:name=".UserEditActivity"
+            android:exported="false"
+            android:label="Editar Usuario"/>
 
-        <!-- Profile Activity -->
-        <activity
-            android:name=".ProfileActivity"
-            android:exported="false"/>
-
-        <!-- Suggestions Activity -->
-        <activity
-            android:name=".SuggestionsActivity"
-            android:exported="false"/>
-
-        <!-- Map Activity -->
-        <activity
-            android:name=".MapActivity"
-            android:exported="false"/>
-
-        <!-- Biblioteca Detail Activity -->
-        <activity
-            android:name=".BibliotecaDetailActivity"
-            android:exported="false"/>
+        <activity android:name=".BookManagementActivity" android:exported="false"/>
+        <activity android:name=".LoanManagementActivity" android:exported="false"/>
+        <activity android:name=".SuggestionsManagementActivity" android:exported="false"/>
+        <activity android:name=".BranchManagementActivity" android:exported="false"/>
+        <activity android:name=".BranchLocationPickerActivity" android:exported="false"/>
+        <activity android:name=".AdminPurchasesActivity" android:exported="false"/>
 
         <!-- ========================================= -->
-        <!-- 🆕 NUEVAS ACTIVIDADES - SUCURSALES Y COMPRAS -->
+        <!-- Actividades de Cajero -->
         <!-- ========================================= -->
 
-        <!-- Branch Books Catalog Activity (Usuario) -->
-        <activity
-            android:name=".BranchBooksCatalogActivity"
-            android:exported="false"/>
-
-        <!-- Purchase Activity -->
-        <activity
-            android:name=".PurchaseActivity"
-            android:exported="false"/>
-
-        <!-- My Purchases Activity -->
-        <activity
-            android:name=".MyPurchasesActivity"
-            android:exported="false"/>
+        <activity android:name=".CashierDashboardActivity" android:exported="false"/>
+        <activity android:name=".CashierOrdersActivity" android:exported="false"/>
+        <activity android:name=".CashierInventoryActivity" android:exported="false"/>
 
         <!-- ========================================= -->
-        <!-- ACTIVIDADES DE ADMINISTRADOR -->
+        <!-- Usuario general -->
         <!-- ========================================= -->
 
-        <!-- Admin Dashboard -->
-        <activity
-            android:name=".AdminDashboardActivity"
-            android:exported="false"/>
-
-        <!-- User Management -->
-        <activity
-            android:name=".UserManagementActivity"
-            android:exported="false"/>
-
-        <!-- Book Management -->
-        <activity
-            android:name=".BookManagementActivity"
-            android:exported="false"/>
-
-        <!-- Loan Management -->
-        <activity
-            android:name=".LoanManagementActivity"
-            android:exported="false"/>
-
-        <!-- Suggestions Management -->
-        <activity
-            android:name=".SuggestionsManagementActivity"
-            android:exported="false"/>
-
-        <!-- 🆕 Branch Management (Admin) -->
-        <activity
-            android:name=".BranchManagementActivity"
-            android:exported="false"/>
-
-        <!-- 🆕 Branch Location Picker -->
-        <activity
-            android:name=".BranchLocationPickerActivity"
-            android:exported="false"/>
-
-        <!-- 🆕 Branch Books Management (Admin) -->
-        <activity
-            android:name=".BranchBooksActivity"
-            android:exported="false"/>
-
-        <!-- 🆕 Admin Purchases Management -->
-        <activity
-            android:name=".AdminPurchasesActivity"
-            android:exported="false"/>
+        <activity android:name=".SearchActivity" android:exported="false"/>
+        <activity android:name=".FavoritesActivity" android:exported="false"/>
+        <activity android:name=".ProfileActivity" android:exported="false"/>
+        <activity android:name=".SuggestionsActivity" android:exported="false"/>
+        <activity android:name=".MapActivity" android:exported="false"/>
+        <activity android:name=".BibliotecaDetailActivity" android:exported="false"/>
+        <activity android:name=".BranchBooksCatalogActivity" android:exported="false"/>
+        <activity android:name=".PurchaseActivity" android:exported="false"/>
+        <activity android:name=".MyPurchasesActivity" android:exported="false"/>
+        <activity android:name=".BranchBooksActivity" android:exported="false"/>
 
         <!-- ========================================= -->
-        <!-- SERVICIOS -->
+        <!-- Servicios -->
         <!-- ========================================= -->
 
-        <!-- Firebase Cloud Messaging Service -->
         <service
             android:name=".services.MyFirebaseMessagingService"
             android:exported="false">
