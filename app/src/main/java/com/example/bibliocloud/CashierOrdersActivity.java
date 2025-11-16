@@ -11,6 +11,10 @@ import com.google.android.material.button.MaterialButton;
 import com.google.firebase.firestore.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import android.content.SharedPreferences;
+import com.example.bibliocloud.models.Payment;
+import com.google.firebase.auth.FirebaseAuth;
+import androidx.appcompat.app.AlertDialog;
 
 public class CashierOrdersActivity extends AppCompatActivity {
 
@@ -331,13 +335,15 @@ public class CashierOrdersActivity extends AppCompatActivity {
         db.collection("compras").document(order.getId())
                 .update(updates)
                 .addOnSuccessListener(aVoid -> {
+                    // Registrar el pago en la colección "pagos"
+                    registerPayment(order);
+
                     Toast.makeText(this,
                             "✅ Pago registrado exitosamente",
                             Toast.LENGTH_LONG).show();
 
-                    // Actualizar inventario (reducir stock)
+                    // Actualizar inventario
                     updateInventoryForOrder(order);
-
                     loadOrders();
                 })
                 .addOnFailureListener(e ->
@@ -345,6 +351,124 @@ public class CashierOrdersActivity extends AppCompatActivity {
                                 "❌ Error al registrar el pago: " + e.getMessage(),
                                 Toast.LENGTH_LONG).show()
                 );
+    }
+
+    private void registerPayment(PurchaseOrder order) {
+        // Obtener información del cajero actual
+        SharedPreferences prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
+        String cashierId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String cashierName = prefs.getString("current_user_name", "Cajero");
+
+        // Construir lista de libros
+        StringBuilder bookTitles = new StringBuilder();
+        for (PurchaseOrder.PurchaseItem item : order.getItems()) {
+            bookTitles.append("• ").append(item.getBookTitle())
+                    .append(" (x").append(item.getQuantity()).append(")\n");
+        }
+
+        // Crear objeto Payment usando el constructor de 13 parámetros
+        Payment payment = new Payment(
+                order.getId(),              // orderId
+                order.getUserId(),          // userId
+                order.getUserName(),        // userName
+                order.getUserEmail(),       // userEmail
+                cashierId,                  // cashierId
+                cashierName,                // cashierName
+                branchId,                   // branchId
+                branchName,                 // branchName
+                order.getPaymentMethod(),   // paymentMethod
+                order.getTotal(),           // total (amount)
+                order.getSubtotal(),        // subtotal
+                order.getTax(),             // tax
+                bookTitles.toString()       // bookTitles
+        );
+
+        // 🔥 IMPORTANTE: Crear un Map con TODOS los campos en español
+        Map<String, Object> paymentData = new HashMap<>();
+        paymentData.put("id_orden", order.getId());
+        paymentData.put("id_usuario", order.getUserId());
+        paymentData.put("nombre_usuario", order.getUserName());
+        paymentData.put("correo_usuario", order.getUserEmail());
+        paymentData.put("id_cajero", cashierId);
+        paymentData.put("nombre_cajero", cashierName);
+        paymentData.put("id_sucursal", branchId);
+        paymentData.put("nombre_sucursal", branchName);
+        paymentData.put("numero_ticket", payment.getTicketNumber());
+        paymentData.put("metodo_pago", order.getPaymentMethod());
+        paymentData.put("monto", order.getTotal());
+        paymentData.put("subtotal", order.getSubtotal());
+        paymentData.put("iva", order.getTax());
+        paymentData.put("libros", bookTitles.toString());
+        paymentData.put("fecha_pago", new Date());
+        paymentData.put("estado", "Completado");
+        paymentData.put("timestamp", System.currentTimeMillis());
+
+        // 🔥 AGREGAR CAMPOS FORMATEADOS PARA CONSULTAS
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+        Date now = new Date();
+
+        paymentData.put("formattedDate", dateFormat.format(now));
+        paymentData.put("formattedTime", timeFormat.format(now));
+        paymentData.put("formattedDateTime", dateFormat.format(now) + " " + timeFormat.format(now));
+
+        // Guardar en Firestore usando el Map
+        db.collection("pagos")
+                .add(paymentData)
+                .addOnSuccessListener(docRef -> {
+                    // Actualizar el payment con el ID generado
+                    payment.setId(docRef.getId());
+
+                    // Mostrar ticket
+                    showPaymentTicket(payment);
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this,
+                            "Error al registrar el pago en historial: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void showPaymentTicket(Payment payment) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("✅ Pago Completado");
+
+        StringBuilder ticket = new StringBuilder();
+        ticket.append("═══════════════════════════\n");
+        ticket.append("       BIBLIOCLOUD\n");
+        ticket.append("       TICKET DE PAGO\n");
+        ticket.append("═══════════════════════════\n\n");
+        ticket.append("Sucursal: ").append(branchName).append("\n");
+        ticket.append("Ticket: #").append(payment.getTicketNumber()).append("\n");
+        ticket.append("Fecha: ").append(payment.getFormattedDate()).append("\n");
+        ticket.append("Hora: ").append(payment.getFormattedTime()).append("\n\n");
+        ticket.append("───────────────────────────\n");
+        ticket.append("Cliente: ").append(payment.getUserName()).append("\n");
+        ticket.append("Email: ").append(payment.getUserEmail()).append("\n\n");
+        ticket.append("───────────────────────────\n");
+        ticket.append("LIBROS COMPRADOS:\n");
+        ticket.append(payment.getBookTitles()).append("\n");
+        ticket.append("───────────────────────────\n");
+        ticket.append("Subtotal: $").append(String.format("%.2f", payment.getSubtotal())).append("\n");
+        ticket.append("IVA (16%): $").append(String.format("%.2f", payment.getTax())).append("\n");
+        ticket.append("TOTAL: $").append(String.format("%.2f", payment.getAmount())).append("\n\n");
+        ticket.append("───────────────────────────\n");
+        ticket.append("Método de pago: ").append(payment.getPaymentMethod()).append("\n");
+        ticket.append("Atendió: ").append(payment.getCashierName()).append("\n\n");
+        ticket.append("═══════════════════════════\n");
+        ticket.append("   ¡Gracias por su compra!\n");
+        ticket.append("      Vuelva pronto\n");
+        ticket.append("═══════════════════════════\n");
+
+        builder.setMessage(ticket.toString());
+        builder.setPositiveButton("Cerrar", null);
+        builder.setNeutralButton("Compartir", (dialog, which) -> {
+            android.content.Intent shareIntent = new android.content.Intent(android.content.Intent.ACTION_SEND);
+            shareIntent.setType("text/plain");
+            shareIntent.putExtra(android.content.Intent.EXTRA_TEXT, ticket.toString());
+            startActivity(android.content.Intent.createChooser(shareIntent, "Compartir ticket"));
+        });
+        builder.show();
     }
 
     private void updateInventoryForOrder(PurchaseOrder order) {

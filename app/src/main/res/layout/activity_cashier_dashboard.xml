@@ -81,13 +81,34 @@
             android:id="@+id/btnCobrarOrdenes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="💰 Cobrar Órdenes de Compra"
-            android:textSize="18sp"
-            android:backgroundTint="@color/accent_brown"
             android:layout_marginBottom="16dp"
-            android:padding="20dp"
+            android:backgroundTint="@color/accent_brown"
             android:drawableLeft="@android:drawable/ic_menu_sort_by_size"
-            android:drawablePadding="8dp"/>
+            android:drawablePadding="8dp"
+            android:padding="20dp"
+            android:text="💰 Cobrar Órdenes de Compra"
+            android:textSize="18sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnVerPagosDiarios"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:padding="16dp"
+            android:text="💵 Ver Pagos del Día"
+            android:textSize="16sp"
+            app:icon="@drawable/ic_payments"
+            app:iconGravity="start" />
+
+        <TextView
+            android:id="@+id/tvTodayPayments"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Pagos hoy: 0 | $0.00"
+            android:textSize="14sp"
+            android:padding="8dp"
+            android:background="@color/light_brown"
+            android:layout_marginTop="4dp"/>
 
         <Button
             android:id="@+id/btnVerInventario"

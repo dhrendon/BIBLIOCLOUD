@@ -104,7 +104,10 @@
         <activity android:name=".PurchaseActivity" android:exported="false"/>
         <activity android:name=".MyPurchasesActivity" android:exported="false"/>
         <activity android:name=".BranchBooksActivity" android:exported="false"/>
-
+        <activity android:name=".CashierDailyPaymentsActivity"
+            android:parentActivityName=".CashierDashboardActivity"/>
+        <activity android:name=".UserPaymentHistoryActivity"
+            android:parentActivityName=".MainActivity"/>
         <!-- ========================================= -->
         <!-- Servicios -->
         <!-- ========================================= -->
