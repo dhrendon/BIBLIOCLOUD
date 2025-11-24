@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -11,6 +12,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -79,11 +81,15 @@ public class SuggestionsManagementActivity extends AppCompatActivity {
                 String autor = doc.getString("author");
                 String categoria = doc.getString("category");
                 String comentarios = doc.getString("comments");
+                String edicion = doc.getString("edition"); // 🆕
+                String isbn = doc.getString("isbn"); // 🆕
+                String year = doc.getString("year"); // 🆕
+                String coverImageUrl = doc.getString("coverImageUrl"); // 🆕
                 String estado = doc.getString("status");
-                String fecha = doc.getString("fecha");
-                String usuario = doc.getString("userName");
+                String usuario = doc.getString("userEmail");
 
-                CardView card = crearCardSugerencia(id, titulo, autor, categoria, comentarios, estado, fecha, usuario);
+                CardView card = crearCardSugerencia(id, titulo, autor, categoria, comentarios,
+                        edicion, isbn, year, coverImageUrl, estado, usuario);
                 layoutListaSugerencias.addView(card);
             }
         }).addOnFailureListener(e -> Toast.makeText(this, "Error al cargar: " + e.getMessage(), Toast.LENGTH_SHORT).show());
@@ -147,7 +153,9 @@ public class SuggestionsManagementActivity extends AppCompatActivity {
         return tarjeta;
     }
 
-    private CardView crearCardSugerencia(String id, String titulo, String autor, String categoria, String comentarios, String estado, String fecha, String usuario) {
+    private CardView crearCardSugerencia(String id, String titulo, String autor, String categoria,
+                                         String comentarios, String edicion, String isbn, String year,
+                                         String coverImageUrl, String estado, String usuario) {
         CardView cardView = new CardView(this);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
@@ -158,9 +166,35 @@ public class SuggestionsManagementActivity extends AppCompatActivity {
         cardView.setRadius(8);
         cardView.setCardBackgroundColor(getResources().getColor(R.color.light_brown));
 
+        // 🆕 Layout horizontal para imagen + contenido
+        LinearLayout mainLayout = new LinearLayout(this);
+        mainLayout.setOrientation(LinearLayout.HORIZONTAL);
+        mainLayout.setPadding(16, 16, 16, 16);
+
+        // 🆕 Imagen de portada (si existe)
+        if (coverImageUrl != null && !coverImageUrl.isEmpty()) {
+            ImageView ivPortada = new ImageView(this);
+            LinearLayout.LayoutParams imgParams = new LinearLayout.LayoutParams(120, 160);
+            imgParams.setMargins(0, 0, 16, 0);
+            ivPortada.setLayoutParams(imgParams);
+            ivPortada.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+            Glide.with(this)
+                    .load(coverImageUrl)
+                    .placeholder(R.drawable.ic_book_placeholder)
+                    .error(R.drawable.ic_book_placeholder)
+                    .into(ivPortada);
+
+            mainLayout.addView(ivPortada);
+        }
+
+        // Layout vertical para información del libro
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(16, 16, 16, 16);
+        LinearLayout.LayoutParams contentParams = new LinearLayout.LayoutParams(
+                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1
+        );
+        layout.setLayoutParams(contentParams);
 
         TextView tvTitulo = new TextView(this);
         tvTitulo.setText(titulo);
@@ -176,14 +210,44 @@ public class SuggestionsManagementActivity extends AppCompatActivity {
         tvCategoria.setText("📚 " + categoria);
         layout.addView(tvCategoria);
 
+        // 🆕 Mostrar edición si existe
+        if (edicion != null && !edicion.isEmpty()) {
+            TextView tvEdicion = new TextView(this);
+            tvEdicion.setText("📖 Edición: " + edicion);
+            tvEdicion.setTextSize(13);
+            tvEdicion.setTextColor(getResources().getColor(R.color.colorTextSecondary));
+            layout.addView(tvEdicion);
+        }
+
+        // 🆕 Mostrar ISBN si existe
+        if (isbn != null && !isbn.isEmpty()) {
+            TextView tvIsbn = new TextView(this);
+            tvIsbn.setText("🔢 ISBN: " + isbn);
+            tvIsbn.setTextSize(13);
+            tvIsbn.setTextColor(getResources().getColor(R.color.colorTextSecondary));
+            layout.addView(tvIsbn);
+        }
+
+        // 🆕 Mostrar año si existe
+        if (year != null && !year.isEmpty()) {
+            TextView tvYear = new TextView(this);
+            tvYear.setText("📅 Año: " + year);
+            tvYear.setTextSize(13);
+            tvYear.setTextColor(getResources().getColor(R.color.colorTextSecondary));
+            layout.addView(tvYear);
+        }
+
         if (comentarios != null && !comentarios.isEmpty()) {
             TextView tvComentarios = new TextView(this);
             tvComentarios.setText("💬 " + comentarios);
+            tvComentarios.setTextSize(13);
             layout.addView(tvComentarios);
         }
 
         TextView tvInfo = new TextView(this);
-        tvInfo.setText("👤 " + usuario + "   📅 " + (fecha != null ? fecha : "Sin fecha"));
+        tvInfo.setText("👤 " + (usuario != null ? usuario : "Desconocido"));
+        tvInfo.setTextSize(12);
+        tvInfo.setTextColor(getResources().getColor(R.color.colorTextSecondary));
         layout.addView(tvInfo);
 
         TextView tvEstado = new TextView(this);
@@ -222,11 +286,13 @@ public class SuggestionsManagementActivity extends AppCompatActivity {
             btnAgregar.setText("Agregar al Catálogo");
             btnAgregar.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
             btnAgregar.setTextColor(getResources().getColor(R.color.white));
-            btnAgregar.setOnClickListener(v -> agregarLibroDesdeSugerencia(titulo, autor, categoria));
+            btnAgregar.setOnClickListener(v -> agregarLibroDesdeSugerencia(titulo, autor, categoria,
+                    edicion, isbn, year, coverImageUrl));
             layout.addView(btnAgregar);
         }
 
-        cardView.addView(layout);
+        mainLayout.addView(layout);
+        cardView.addView(mainLayout);
         return cardView;
     }
 
@@ -243,11 +309,16 @@ public class SuggestionsManagementActivity extends AppCompatActivity {
                         Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
-    private void agregarLibroDesdeSugerencia(String titulo, String autor, String categoria) {
+    private void agregarLibroDesdeSugerencia(String titulo, String autor, String categoria,
+                                             String edicion, String isbn, String year, String coverImageUrl) {
         Intent intent = new Intent(this, BookManagementActivity.class);
         intent.putExtra("titulo_sugerencia", titulo);
         intent.putExtra("autor_sugerencia", autor);
         intent.putExtra("categoria_sugerencia", categoria);
+        intent.putExtra("edicion_sugerencia", edicion); // 🆕
+        intent.putExtra("isbn_sugerencia", isbn); // 🆕
+        intent.putExtra("year_sugerencia", year); // 🆕
+        intent.putExtra("cover_url_sugerencia", coverImageUrl); // 🆕
         startActivity(intent);
     }
 }

@@ -15,6 +15,13 @@ public class Suggestion {
     private String comments;
     private String userEmail;
     private String userId;
+
+    // 🆕 NUEVOS CAMPOS
+    private String edition;        // Edición (opcional)
+    private String isbn;           // ISBN (opcional)
+    private String year;           // 🆕 Año del libro (opcional)
+    private String coverImageUrl;  // URL de la imagen en Firebase Storage
+
     @ServerTimestamp
     private Date suggestionDate;
     private String status;
@@ -31,7 +38,7 @@ public class Suggestion {
         this.suggestionDate = new Date();
     }
 
-    // Getters y Setters
+    // Getters y Setters existentes
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
@@ -58,6 +65,20 @@ public class Suggestion {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    // 🆕 NUEVOS GETTERS Y SETTERS
+    public String getEdition() { return edition; }
+    public void setEdition(String edition) { this.edition = edition; }
+
+    public String getIsbn() { return isbn; }
+    public void setIsbn(String isbn) { this.isbn = isbn; }
+
+    public String getCoverImageUrl() { return coverImageUrl; }
+    public void setCoverImageUrl(String coverImageUrl) { this.coverImageUrl = coverImageUrl; }
+
+    // 🆕 GETTER Y SETTER PARA AÑO
+    public String getYear() { return year; }
+    public void setYear(String year) { this.year = year; }
 
     public String getFormattedDate() {
         if (suggestionDate == null) return "";

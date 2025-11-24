@@ -19,25 +19,37 @@ public class Book {
     @PropertyName("autor")
     private String author;
 
-    @PropertyName("categoria")
-    private String category;
-
     @PropertyName("anio")
     private String year;
+
+    @PropertyName("editorial")
+    private String publisher;
+
+    @PropertyName("numero_edicion")
+    private String editionNumber;
 
     @PropertyName("isbn")
     private String isbn;
 
-    @PropertyName("estado")
-    private String status;
+    @PropertyName("categoria")
+    private String category;
+
+    @PropertyName("numero_paginas")
+    private int pageCount;
+
+    @PropertyName("idioma")
+    private String language;
 
     @PropertyName("descripcion")
     private String description;
 
-    @PropertyName("foto")
-    private String fotoBase64; // 🔥 Se cambió a fotoBase64 para claridad
+    @PropertyName("estado")
+    private String status;
 
-    // Campos locales
+    @PropertyName("foto")
+    private String fotoBase64;
+
+    // Campos locales (no en Firestore)
     private boolean isFavorite;
     private float rating;
     private int ratingCount;
@@ -46,17 +58,27 @@ public class Book {
     // Constructor vacío (Firebase lo necesita)
     public Book() {
         this.createdAt = System.currentTimeMillis();
+        this.status = "Disponible";
+        this.language = "Español";
+        this.pageCount = 0;
     }
 
-    public Book(String id, String title, String author, String category, String year,
-                String status, String description, String fotoBase64) {
+    // Constructor completo
+    public Book(String id, String title, String author, String year, String publisher,
+                String editionNumber, String isbn, String category, int pageCount,
+                String language, String description, String status, String fotoBase64) {
         this.id = id;
         this.title = title;
         this.author = author;
-        this.category = category;
         this.year = year;
-        this.status = status;
+        this.publisher = publisher;
+        this.editionNumber = editionNumber;
+        this.isbn = isbn;
+        this.category = category;
+        this.pageCount = pageCount;
+        this.language = language;
         this.description = description;
+        this.status = status;
         this.fotoBase64 = fotoBase64;
         this.isFavorite = false;
         this.rating = 0.0f;
@@ -78,30 +100,50 @@ public class Book {
     @PropertyName("autor")
     public void setAuthor(String author) { this.author = author; }
 
-    @PropertyName("categoria")
-    public String getCategory() { return category != null ? category : "Sin categoría"; }
-    @PropertyName("categoria")
-    public void setCategory(String category) { this.category = category; }
-
     @PropertyName("anio")
     public String getYear() { return year != null ? year : "Año no disponible"; }
     @PropertyName("anio")
     public void setYear(String year) { this.year = year; }
+
+    @PropertyName("editorial")
+    public String getPublisher() { return publisher != null ? publisher : "Editorial no disponible"; }
+    @PropertyName("editorial")
+    public void setPublisher(String publisher) { this.publisher = publisher; }
+
+    @PropertyName("numero_edicion")
+    public String getEditionNumber() { return editionNumber != null ? editionNumber : "1"; }
+    @PropertyName("numero_edicion")
+    public void setEditionNumber(String editionNumber) { this.editionNumber = editionNumber; }
 
     @PropertyName("isbn")
     public String getIsbn() { return isbn != null ? isbn : "Sin ISBN"; }
     @PropertyName("isbn")
     public void setIsbn(String isbn) { this.isbn = isbn; }
 
-    @PropertyName("estado")
-    public String getStatus() { return status != null ? status : "Disponible"; }
-    @PropertyName("estado")
-    public void setStatus(String status) { this.status = status; }
+    @PropertyName("categoria")
+    public String getCategory() { return category != null ? category : "Sin categoría"; }
+    @PropertyName("categoria")
+    public void setCategory(String category) { this.category = category; }
+
+    @PropertyName("numero_paginas")
+    public int getPageCount() { return pageCount; }
+    @PropertyName("numero_paginas")
+    public void setPageCount(int pageCount) { this.pageCount = pageCount; }
+
+    @PropertyName("idioma")
+    public String getLanguage() { return language != null ? language : "Español"; }
+    @PropertyName("idioma")
+    public void setLanguage(String language) { this.language = language; }
 
     @PropertyName("descripcion")
     public String getDescription() { return description != null ? description : "Sin descripción"; }
     @PropertyName("descripcion")
     public void setDescription(String description) { this.description = description; }
+
+    @PropertyName("estado")
+    public String getStatus() { return status != null ? status : "Disponible"; }
+    @PropertyName("estado")
+    public void setStatus(String status) { this.status = status; }
 
     // === Imagen en Base64 ===
     @PropertyName("foto")
@@ -110,7 +152,6 @@ public class Book {
     @PropertyName("foto")
     public void setFotoBase64(String fotoBase64) { this.fotoBase64 = fotoBase64; }
 
-    // 🔥 Convierte la cadena Base64 a Bitmap (para mostrar en ImageView)
     @Exclude
     public Bitmap getFotoAsBitmap() {
         try {
@@ -145,5 +186,12 @@ public class Book {
         float totalRating = this.rating * this.ratingCount;
         this.ratingCount++;
         this.rating = (totalRating + newRating) / this.ratingCount;
+    }
+
+    // Método para información completa del libro
+    @Exclude
+    public String getFullInfo() {
+        return String.format("📖 %s\n✍️ %s\n📅 %s\n🏢 %s\n📄 Edición: %s\n📚 ISBN: %s\n🔖 %s\n📄 %d páginas\n🌐 %s",
+                title, author, year, publisher, editionNumber, isbn, category, pageCount, language);
     }
 }

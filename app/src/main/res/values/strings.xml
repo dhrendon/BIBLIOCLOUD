@@ -124,4 +124,27 @@
     <string name="loading">Cargando...</string>
     <string name="yes">Sí</string>
     <string name="no">No</string>
+    <string name="header_gestion_libros">📚 Gestión de Libros</string>
+    <string name="titulo_agregar_libro">➕ Agregar Nuevo Libro</string>
+    <string name="label_foto_libro">📷 Foto del Libro</string>
+    <string name="desc_foto_libro">Imagen de portada del libro</string>
+    <string name="btn_seleccionar_foto">📸 Seleccionar Foto</string>
+
+    <string name="hint_titulo">* Título del libro</string>
+    <string name="hint_autor">* Autor(es)</string>
+    <string name="hint_anio">* Año</string>
+    <string name="hint_edicion">* Edición</string>
+    <string name="valor_defecto_edicion">1</string>
+    <string name="hint_editorial">* Editorial</string>
+    <string name="hint_isbn">* ISBN</string>
+    <string name="label_categoria">* Categoría / Género</string>
+    <string name="hint_paginas">* Número de páginas</string>
+    <string name="label_idioma">* Idioma</string>
+    <string name="hint_descripcion">* Descripción / Sinopsis</string>
+    <string name="label_estado">Estado del libro</string>
+    <string name="nota_obligatorios">* Campos obligatorios</string>
+
+    <string name="btn_agregar_libro">Agregar Libro</string>
+    <string name="header_catalogo">Catálogo de Libros</string>
+    <string name="btn_volver">Volver</string>
 </resources>

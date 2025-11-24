@@ -9,7 +9,8 @@
       "client_info": {
         "mobilesdk_app_id": "1:993865957507:android:5fd320c77d9c5fabc9dbb6",
         "android_client_info": {
-          "package_name": "com.example.bibliocloud"
+          "package_name": "com.example.bibliocloud",
+          "sha1": "55:d8:fe:2d:ec:4d:f3:0a:03:4a:2a:aa:28:b3:32:70:6e:0d:2c:5b"
         }
       },
       "oauth_client": [],

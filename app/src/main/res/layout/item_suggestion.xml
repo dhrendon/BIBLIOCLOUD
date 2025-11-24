@@ -10,87 +10,139 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp"
+        android:orientation="horizontal"
+        android:padding="12dp"
         android:background="@color/white">
 
-        <!-- Título -->
-        <TextView
-            android:id="@+id/tvTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Título del Libro"
-            android:textColor="@color/colorTextPrimary"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+        <!-- 🆕 Imagen de portada -->
+        <ImageView
+            android:id="@+id/ivCover"
+            android:layout_width="70dp"
+            android:layout_height="90dp"
+            android:scaleType="centerCrop"
+            android:layout_marginEnd="12dp"
+            android:contentDescription="Portada del libro"
+            android:visibility="gone" />
 
-        <!-- Autor -->
-        <TextView
-            android:id="@+id/tvAuthor"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="por Autor"
-            android:textColor="@color/colorTextSecondary"
-            android:textSize="14sp"
-            android:layout_marginTop="4dp" />
-
-        <!-- Información en línea -->
+        <!-- Información del libro -->
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="8dp">
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-            <!-- Categoría -->
+            <!-- Título -->
             <TextView
-                android:id="@+id/tvCategory"
-                android:layout_width="0dp"
+                android:id="@+id/tvTitle"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Categoría"
-                android:textColor="@color/colorTextSecondary"
-                android:textSize="12sp"
-                android:background="@color/light_brown"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="4dp"
-                android:gravity="center" />
+                android:text="Título del Libro"
+                android:textColor="@color/colorTextPrimary"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
-            <!-- Fecha -->
+            <!-- Autor -->
             <TextView
-                android:id="@+id/tvDate"
+                android:id="@+id/tvAuthor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="por Autor"
+                android:textColor="@color/colorTextSecondary"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp" />
+
+            <!-- Información en línea -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp">
+
+                <!-- Categoría -->
+                <TextView
+                    android:id="@+id/tvCategory"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Categoría"
+                    android:textColor="@color/colorTextSecondary"
+                    android:textSize="12sp"
+                    android:background="@color/light_brown"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
+                    android:gravity="center" />
+
+                <!-- Fecha -->
+                <TextView
+                    android:id="@+id/tvDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="01/01/2024"
+                    android:textColor="@color/colorTextSecondary"
+                    android:textSize="12sp"
+                    android:layout_marginStart="8dp" />
+
+            </LinearLayout>
+
+            <!-- 🆕 Edición -->
+            <TextView
+                android:id="@+id/tvEdition"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Edición: 3ra"
+                android:textSize="12sp"
+                android:textColor="@color/colorTextSecondary"
+                android:layout_marginTop="4dp"
+                android:visibility="gone" />
+
+            <!-- 🆕 ISBN -->
+            <TextView
+                android:id="@+id/tvIsbn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ISBN: 978-1234567890"
+                android:textSize="12sp"
+                android:textColor="@color/colorTextSecondary"
+                android:layout_marginTop="2dp"
+                android:visibility="gone" />
+
+            <!-- 🆕 Año -->
+            <TextView
+                android:id="@+id/tvYear"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Año: 2024"
+                android:textSize="12sp"
+                android:textColor="@color/colorTextSecondary"
+                android:layout_marginTop="2dp"
+                android:visibility="gone" />
+
+            <!-- Estado -->
+            <TextView
+                android:id="@+id/tvStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="01/01/2024"
+                android:text="Pendiente"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:background="@color/orange"
+                android:layout_marginTop="8dp"
+                android:gravity="center" />
+
+            <!-- Comentarios -->
+            <TextView
+                android:id="@+id/tvComments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Comentarios: "
                 android:textColor="@color/colorTextSecondary"
                 android:textSize="12sp"
-                android:layout_marginStart="8dp" />
+                android:layout_marginTop="8dp"
+                android:visibility="gone" />
 
         </LinearLayout>
-
-        <!-- Estado -->
-        <TextView
-            android:id="@+id/tvStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Pendiente"
-            android:textColor="@color/white"
-            android:textSize="10sp"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="4dp"
-            android:background="@color/orange"
-            android:layout_marginTop="8dp"
-            android:gravity="center" />
-
-        <!-- Comentarios -->
-        <TextView
-            android:id="@+id/tvComments"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Comentarios: "
-            android:textColor="@color/colorTextSecondary"
-            android:textSize="12sp"
-            android:layout_marginTop="8dp"
-            android:visibility="gone" />
 
     </LinearLayout>
 

@@ -7,5 +7,6 @@ buildscript {
         classpath("com.android.tools.build:gradle:8.7.0")
         classpath("com.google.gms:google-services:4.4.0")
     }
+
 }
 

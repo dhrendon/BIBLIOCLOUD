@@ -1,237 +1,333 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:padding="16dp"
     android:background="@color/colorBackground">
 
-    <LinearLayout
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:text="@string/header_gestion_libros"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorPrimary"
+        android:gravity="center"
+        android:layout_marginBottom="16dp"/>
 
-        <!-- Header -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Gestión de Libros"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:layout_marginBottom="24dp"
-            android:textColor="@color/colorTextPrimary" />
-
-        <!-- Formulario de Libro -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Agregar Nuevo Libro"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp"
-            android:textColor="@color/colorTextPrimary" />
-
-        <!-- Título -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            app:boxBackgroundColor="@color/white">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etTitulo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Título del libro *"
-                android:textColorHint="@color/colorTextSecondary" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Autor -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            app:boxBackgroundColor="@color/white">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etAutor"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Autor *"
-                android:textColorHint="@color/colorTextSecondary" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Categoría -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Categoría *"
-            android:textSize="14sp"
-            android:textColor="@color/colorTextSecondary"
-            android:layout_marginBottom="4dp" />
-
-        <Spinner
-            android:id="@+id/spinnerCategoria"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:background="@drawable/spinner_background" />
-
-        <!-- Año -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            app:boxBackgroundColor="@color/white">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etAnio"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Año de publicación *"
-                android:inputType="number"
-                android:textColorHint="@color/colorTextSecondary" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- ISBN -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            app:boxBackgroundColor="@color/white">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etIsbn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="ISBN *"
-                android:textColorHint="@color/colorTextSecondary" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Estado -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Estado *"
-            android:textSize="14sp"
-            android:textColor="@color/colorTextSecondary"
-            android:layout_marginBottom="4dp" />
-
-        <Spinner
-            android:id="@+id/spinnerEstado"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:background="@drawable/spinner_background" />
-
-        <!-- Descripción -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:boxBackgroundColor="@color/white">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etDescripcion"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Descripción (opcional)"
-                android:inputType="textMultiLine"
-                android:minLines="3"
-                android:textColorHint="@color/colorTextSecondary" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-        <!-- Agregar después del campo de descripción -->
-
-        <!-- Sección de Foto -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Foto del Libro (Opcional)"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="@color/colorTextPrimary"
-            android:layout_marginBottom="8dp" />
+    <ScrollView
+        android:id="@+id/scrollFormulario"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="16dp">
+            android:orientation="vertical">
 
-            <!-- Vista previa de la foto -->
-            <ImageView
-                android:id="@+id/ivFotoLibro"
-                android:layout_width="120dp"
-                android:layout_height="160dp"
-                android:layout_marginEnd="16dp"
-                android:background="@color/light_brown"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_camera"
-                android:contentDescription="Vista previa foto libro"
-                android:clickable="true"
-                android:focusable="true" />
-
-            <!-- Botón para tomar foto -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnTomarFoto"
-                android:layout_width="0dp"
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="📷 Tomar/Elegir Foto"
-                android:backgroundTint="@color/accent_brown"
-                android:textColor="@color/white" />
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@color/white">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/titulo_agregar_libro"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorPrimary"
+                        android:layout_marginBottom="16dp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_foto_libro"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/dark_brown"
+                        android:layout_marginBottom="8dp"/>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp">
+
+                        <ImageView
+                            android:id="@+id/ivFotoLibro"
+                            android:layout_width="200dp"
+                            android:layout_height="250dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_camera"
+                            android:contentDescription="@string/desc_foto_libro"
+                            android:scaleType="centerCrop"
+                            android:background="@color/light_brown"
+                            android:clickable="true"
+                            android:focusable="true"/>
+                    </FrameLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnTomarFoto"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/btn_seleccionar_foto"
+                        android:textColor="@color/colorPrimary"
+                        app:strokeColor="@color/colorPrimary"
+                        app:strokeWidth="2dp"
+                        android:layout_marginBottom="16dp"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_titulo"
+                        app:boxStrokeColor="@color/colorPrimary"
+                        app:hintTextColor="@color/colorPrimary"
+                        android:layout_marginBottom="12dp"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etTitulo"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textCapWords"
+                            android:maxLines="2"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_autor"
+                        app:boxStrokeColor="@color/colorPrimary"
+                        app:hintTextColor="@color/colorPrimary"
+                        android:layout_marginBottom="12dp"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etAutor"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textCapWords"
+                            android:maxLines="2"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:baselineAligned="false"
+                        android:layout_marginBottom="12dp">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:hint="@string/hint_anio"
+                            app:boxStrokeColor="@color/colorPrimary"
+                            app:hintTextColor="@color/colorPrimary"
+                            android:layout_marginEnd="8dp"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etAnio"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="number"
+                                android:maxLength="4"/>
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:hint="@string/hint_edicion"
+                            app:boxStrokeColor="@color/colorPrimary"
+                            app:hintTextColor="@color/colorPrimary"
+                            android:layout_marginStart="8dp"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etNumeroEdicion"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="text"
+                                android:text="@string/valor_defecto_edicion"/>
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_editorial"
+                        app:boxStrokeColor="@color/colorPrimary"
+                        app:hintTextColor="@color/colorPrimary"
+                        android:layout_marginBottom="12dp"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etEditorial"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textCapWords"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_isbn"
+                        app:boxStrokeColor="@color/colorPrimary"
+                        app:hintTextColor="@color/colorPrimary"
+                        android:layout_marginBottom="12dp"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etIsbn"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="text"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <TextView
+                        android:text="@string/label_categoria"
+                        android:textSize="14sp"
+                        android:textColor="@color/colorTextPrimary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"/>
+
+                    <Spinner
+                        android:id="@+id/spinnerCategoria"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="48dp"
+                        android:layout_marginBottom="12dp"
+                        android:background="@drawable/spinner_background"/>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_paginas"
+                        app:boxStrokeColor="@color/colorPrimary"
+                        app:hintTextColor="@color/colorPrimary"
+                        android:layout_marginBottom="12dp"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etNumeroPaginas"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="number"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <TextView
+                        android:text="@string/label_idioma"
+                        android:textSize="14sp"
+                        android:textColor="@color/colorTextPrimary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"/>
+
+                    <Spinner
+                        android:id="@+id/spinnerIdioma"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="48dp"
+                        android:layout_marginBottom="12dp"
+                        android:background="@drawable/spinner_background"/>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_descripcion"
+                        app:boxStrokeColor="@color/colorPrimary"
+                        app:hintTextColor="@color/colorPrimary"
+                        android:layout_marginBottom="12dp"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etDescripcion"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textMultiLine"
+                            android:minLines="3"
+                            android:maxLines="5"
+                            android:gravity="top|start"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <TextView
+                        android:text="@string/label_estado"
+                        android:textSize="14sp"
+                        android:textColor="@color/colorTextPrimary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"/>
+
+                    <Spinner
+                        android:id="@+id/spinnerEstado"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="48dp"
+                        android:layout_marginBottom="16dp"
+                        android:background="@drawable/spinner_background"/>
+
+                    <TextView
+                        android:text="@string/nota_obligatorios"
+                        android:textSize="12sp"
+                        android:textColor="@color/red"
+                        android:textStyle="italic"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAgregarLibro"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/btn_agregar_libro"
+                        android:textSize="16sp"
+                        android:padding="16dp"
+                        android:backgroundTint="@color/colorPrimary"
+                        app:cornerRadius="8dp"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/header_catalogo"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorPrimary"
+                android:layout_marginBottom="12dp"/>
+
+            <LinearLayout
+                android:id="@+id/layoutListaLibros"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
         </LinearLayout>
+    </ScrollView>
 
-        <!-- Botón Agregar -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnAgregarLibro"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text=" Agregar Libro"
-            android:layout_marginBottom="24dp"
-            android:backgroundTint="@color/colorPrimary"
-            android:textColor="@color/white" />
-
-        <!-- Separador -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/light_brown"
-            android:layout_marginBottom="16dp" />
-
-        <!-- Lista de Libros -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Catálogo de Libros"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp"
-            android:textColor="@color/colorTextPrimary" />
-
-        <LinearLayout
-            android:id="@+id/layoutListaLibros"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginBottom="16dp" />
-
-        <!-- Botón Volver -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnVolver"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="⬅ Volver al Dashboard"
-            android:backgroundTint="@color/accent_brown"
-            android:textColor="@color/white" />
-
-    </LinearLayout>
-
-</ScrollView>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnVolver"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_volver"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/colorPrimary"
+        app:strokeColor="@color/colorPrimary"
+        app:strokeWidth="2dp"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+</LinearLayout>

@@ -71,6 +71,53 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- 🆕 Edición (Opcional) -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etEdition"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Edición (opcional)"
+                    android:textColor="@color/colorTextPrimary" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- 🆕 ISBN (Opcional) -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etIsbn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="ISBN (opcional)"
+                    android:inputType="text"
+                    android:textColor="@color/colorTextPrimary" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- 🆕 Año del Libro (Opcional) -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etYear"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Año de publicación (opcional)"
+                    android:inputType="number"
+                    android:textColor="@color/colorTextPrimary" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
             <!-- Categoría -->
             <TextView
                 android:layout_width="match_parent"
@@ -92,7 +139,7 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="12dp">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etComments"
@@ -104,6 +151,28 @@
                     android:textColor="@color/colorTextPrimary" />
 
             </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- 🆕 Botón para seleccionar/tomar imagen -->
+            <Button
+                android:id="@+id/btnSelectImage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="📷 Agregar Portada (opcional)"
+                android:backgroundTint="@color/dark_brown"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- 🆕 Vista previa de la imagen -->
+            <ImageView
+                android:id="@+id/ivCoverPreview"
+                android:layout_width="120dp"
+                android:layout_height="160dp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="12dp"
+                android:scaleType="centerCrop"
+                android:visibility="gone"
+                android:contentDescription="Vista previa de portada" />
 
             <!-- Botón Enviar -->
             <Button
