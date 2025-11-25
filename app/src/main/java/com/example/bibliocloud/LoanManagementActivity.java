@@ -45,7 +45,7 @@ public class LoanManagementActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_loan_management);
+        setContentView(R.layout.activity_loan_management); // Asegúrate de que este layout existe
 
         initializeViews();
         setupFirebase();
@@ -57,9 +57,13 @@ public class LoanManagementActivity extends AppCompatActivity {
     }
 
     private void initializeViews() {
+        // 🔥 CORREGIDO: Usar IDs que existen en tu XML de préstamos
         spinnerUsuario = findViewById(R.id.spinnerUsuario);
-        spinnerLibro = findViewById(R.id.spinnerLibro);
-        etFechaPrestamo = findViewById(R.id.etFechaPrestamo);
+        spinnerLibro = findViewById(R.id.spinnerBook);
+
+        // 🔥 CORREGIDO: Estos IDs probablemente no existen en tu XML actual
+        // Necesitas crear un layout específico para préstamos o usar los que tienes
+        etFechaPrestamo = findViewById(R.id.etFechaPrestamo); // Cambiar ID
         etFechaDevolucion = findViewById(R.id.etFechaDevolucion);
         btnRealizarPrestamo = findViewById(R.id.btnRealizarPrestamo);
         btnVolver = findViewById(R.id.btnVolver);
@@ -72,8 +76,13 @@ public class LoanManagementActivity extends AppCompatActivity {
         calendarDevolucion.add(Calendar.DAY_OF_YEAR, 14); // 2 semanas por defecto
         dateFormatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
-        etFechaPrestamo.setText(dateFormatter.format(calendarPrestamo.getTime()));
-        etFechaDevolucion.setText(dateFormatter.format(calendarDevolucion.getTime()));
+        // Solo establecer texto si los EditText existen
+        if (etFechaPrestamo != null) {
+            etFechaPrestamo.setText(dateFormatter.format(calendarPrestamo.getTime()));
+        }
+        if (etFechaDevolucion != null) {
+            etFechaDevolucion.setText(dateFormatter.format(calendarDevolucion.getTime()));
+        }
     }
 
     private void setupFirebase() {
@@ -86,17 +95,21 @@ public class LoanManagementActivity extends AppCompatActivity {
     private void loadUsuarios() {
         usuariosRef.get().addOnSuccessListener(query -> {
             usuariosList.clear();
+            usuariosList.add("Seleccionar usuario"); // Opción por defecto
             for (DocumentSnapshot doc : query) {
                 String nombre = doc.getString("nombre");
                 if (nombre != null) usuariosList.add(nombre);
             }
-            spinnerUsuario.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, usuariosList));
+            if (spinnerUsuario != null) {
+                spinnerUsuario.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, usuariosList));
+            }
         });
     }
 
     private void loadLibrosDisponibles() {
         librosRef.whereEqualTo("estado", "Disponible").get().addOnSuccessListener(query -> {
             librosDisponiblesList.clear();
+            librosDisponiblesList.add("Seleccionar libro"); // Opción por defecto
             for (DocumentSnapshot doc : query) {
                 String titulo = doc.getString("titulo");
                 String autor = doc.getString("autor");
@@ -104,19 +117,27 @@ public class LoanManagementActivity extends AppCompatActivity {
                     librosDisponiblesList.add(titulo + " - " + autor);
                 }
             }
-            spinnerLibro.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, librosDisponiblesList));
+            if (spinnerLibro != null) {
+                spinnerLibro.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, librosDisponiblesList));
+            }
         });
     }
 
     private void setupDatePickers() {
-        btnSeleccionarFechaPrestamo.setOnClickListener(v ->
-                showDatePickerDialog(etFechaPrestamo, calendarPrestamo));
+        if (btnSeleccionarFechaPrestamo != null) {
+            btnSeleccionarFechaPrestamo.setOnClickListener(v ->
+                    showDatePickerDialog(etFechaPrestamo, calendarPrestamo));
+        }
 
-        btnSeleccionarFechaDevolucion.setOnClickListener(v ->
-                showDatePickerDialog(etFechaDevolucion, calendarDevolucion));
+        if (btnSeleccionarFechaDevolucion != null) {
+            btnSeleccionarFechaDevolucion.setOnClickListener(v ->
+                    showDatePickerDialog(etFechaDevolucion, calendarDevolucion));
+        }
     }
 
     private void showDatePickerDialog(final EditText editText, final Calendar calendar) {
+        if (editText == null) return;
+
         DatePickerDialog datePicker = new DatePickerDialog(
                 this,
                 (view, year, month, dayOfMonth) -> {
@@ -131,17 +152,27 @@ public class LoanManagementActivity extends AppCompatActivity {
     }
 
     private void setupButtonListeners() {
-        btnRealizarPrestamo.setOnClickListener(v -> realizarPrestamo());
-        btnVolver.setOnClickListener(v -> finish());
+        if (btnRealizarPrestamo != null) {
+            btnRealizarPrestamo.setOnClickListener(v -> realizarPrestamo());
+        }
+        if (btnVolver != null) {
+            btnVolver.setOnClickListener(v -> finish());
+        }
     }
 
     private void realizarPrestamo() {
+        if (spinnerUsuario == null || spinnerLibro == null) {
+            Toast.makeText(this, "Error: Elementos de UI no encontrados", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         String usuario = spinnerUsuario.getSelectedItem() != null ? spinnerUsuario.getSelectedItem().toString() : "";
         String libro = spinnerLibro.getSelectedItem() != null ? spinnerLibro.getSelectedItem().toString() : "";
-        String fechaPrestamo = etFechaPrestamo.getText().toString();
-        String fechaDevolucion = etFechaDevolucion.getText().toString();
+        String fechaPrestamo = etFechaPrestamo != null ? etFechaPrestamo.getText().toString() : "";
+        String fechaDevolucion = etFechaDevolucion != null ? etFechaDevolucion.getText().toString() : "";
 
-        if (usuario.isEmpty() || libro.isEmpty()) {
+        if (usuario.isEmpty() || usuario.equals("Seleccionar usuario") ||
+                libro.isEmpty() || libro.equals("Seleccionar libro")) {
             Toast.makeText(this, "Seleccione usuario y libro", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -163,7 +194,8 @@ public class LoanManagementActivity extends AppCompatActivity {
     }
 
     private void updateLibroEstado(String libro, String nuevoEstado) {
-        librosRef.whereEqualTo("titulo", libro.split(" - ")[0])
+        String tituloLibro = libro.split(" - ")[0];
+        librosRef.whereEqualTo("titulo", tituloLibro)
                 .get()
                 .addOnSuccessListener(query -> {
                     for (DocumentSnapshot doc : query) {
@@ -174,12 +206,16 @@ public class LoanManagementActivity extends AppCompatActivity {
     }
 
     private void loadPrestamos() {
+        if (layoutListaPrestamos == null) return;
+
         layoutListaPrestamos.removeAllViews();
 
         prestamosRef.get().addOnSuccessListener(query -> {
             if (query.isEmpty()) {
                 TextView tvEmpty = new TextView(this);
                 tvEmpty.setText("No hay préstamos registrados");
+                tvEmpty.setTextSize(16);
+                tvEmpty.setPadding(0, 16, 0, 16);
                 layoutListaPrestamos.addView(tvEmpty);
                 return;
             }
@@ -230,10 +266,12 @@ public class LoanManagementActivity extends AppCompatActivity {
         tvEstado.setText("🔄 Estado: " + estado);
         cardLayout.addView(tvEstado);
 
-        Button btnDevolver = new Button(this);
-        btnDevolver.setText("Registrar Devolución");
-        btnDevolver.setOnClickListener(v -> registrarDevolucion(id, libro));
-        cardLayout.addView(btnDevolver);
+        if ("Activo".equals(estado)) {
+            Button btnDevolver = new Button(this);
+            btnDevolver.setText("Registrar Devolución");
+            btnDevolver.setOnClickListener(v -> registrarDevolucion(id, libro));
+            cardLayout.addView(btnDevolver);
+        }
 
         cardView.addView(cardLayout);
         return cardView;

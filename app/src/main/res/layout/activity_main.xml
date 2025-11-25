@@ -37,21 +37,22 @@
                 android:gravity="center"
                 android:layout_marginBottom="24dp"/>
 
-            <!-- Grid de opciones -->
+            <!-- Grid de opciones - 3 filas x 3 columnas para 9 elementos -->
             <androidx.gridlayout.widget.GridLayout
                 android:id="@+id/gridLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:columnCount="2"
-                app:rowCount="4"
+                app:columnCount="3"
+                app:rowCount="3"
                 android:layout_marginBottom="16dp">
 
-                <!-- Buscar Libros -->
+                <!-- Buscar Libros (0) -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
                     android:layout_height="150dp"
                     android:layout_margin="8dp"
                     app:layout_columnWeight="1"
+                    app:layout_rowWeight="1"
                     app:cardElevation="4dp"
                     app:cardCornerRadius="8dp"
                     app:cardBackgroundColor="@color/white">
@@ -74,19 +75,20 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Buscar Libros"
-                            android:textSize="16sp"
+                            android:textSize="14sp"
                             android:textStyle="bold"
                             android:textColor="@color/colorPrimary"
                             android:gravity="center"/>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
-                <!-- Mis Favoritos -->
+                <!-- Mis Favoritos (1) -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
                     android:layout_height="150dp"
                     android:layout_margin="8dp"
                     app:layout_columnWeight="1"
+                    app:layout_rowWeight="1"
                     app:cardElevation="4dp"
                     app:cardCornerRadius="8dp"
                     app:cardBackgroundColor="@color/white">
@@ -109,19 +111,20 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Mis Favoritos"
-                            android:textSize="16sp"
+                            android:textSize="14sp"
                             android:textStyle="bold"
                             android:textColor="@color/colorPrimary"
                             android:gravity="center"/>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
-                <!-- Sugerencias -->
+                <!-- Sugerencias (2) -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
                     android:layout_height="150dp"
                     android:layout_margin="8dp"
                     app:layout_columnWeight="1"
+                    app:layout_rowWeight="1"
                     app:cardElevation="4dp"
                     app:cardCornerRadius="8dp"
                     app:cardBackgroundColor="@color/white">
@@ -144,19 +147,20 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Sugerencias"
-                            android:textSize="16sp"
+                            android:textSize="14sp"
                             android:textStyle="bold"
                             android:textColor="@color/colorPrimary"
                             android:gravity="center"/>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
-                <!-- 🆕 Catálogo por Sucursal -->
+                <!-- Catálogo por Sucursal (3) -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
                     android:layout_height="150dp"
                     android:layout_margin="8dp"
                     app:layout_columnWeight="1"
+                    app:layout_rowWeight="1"
                     app:cardElevation="4dp"
                     app:cardCornerRadius="8dp"
                     app:cardBackgroundColor="@color/white">
@@ -179,19 +183,20 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Catálogo por Sucursal"
-                            android:textSize="14sp"
+                            android:textSize="12sp"
                             android:textStyle="bold"
                             android:textColor="@color/colorPrimary"
                             android:gravity="center"/>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
-                <!-- Mapa -->
+                <!-- Mapa de Bibliotecas (4) -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
                     android:layout_height="150dp"
                     android:layout_margin="8dp"
                     app:layout_columnWeight="1"
+                    app:layout_rowWeight="1"
                     app:cardElevation="4dp"
                     app:cardCornerRadius="8dp"
                     app:cardBackgroundColor="@color/white">
@@ -214,19 +219,20 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Mapa de Bibliotecas"
-                            android:textSize="14sp"
+                            android:textSize="12sp"
                             android:textStyle="bold"
                             android:textColor="@color/colorPrimary"
                             android:gravity="center"/>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
-                <!-- 🆕 Mis Compras -->
+                <!-- Mis Compras (5) -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
                     android:layout_height="150dp"
                     android:layout_margin="8dp"
                     app:layout_columnWeight="1"
+                    app:layout_rowWeight="1"
                     app:cardElevation="4dp"
                     app:cardCornerRadius="8dp"
                     app:cardBackgroundColor="@color/white">
@@ -249,20 +255,21 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Mis Compras"
-                            android:textSize="16sp"
+                            android:textSize="14sp"
                             android:textStyle="bold"
                             android:textColor="@color/colorPrimary"
                             android:gravity="center"/>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
-                <!-- 🆕 Panel Admin (solo visible para admin) -->
+                <!-- Panel Admin (6) -->
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardAdminPanel"
                     android:layout_width="0dp"
                     android:layout_height="150dp"
                     android:layout_margin="8dp"
                     app:layout_columnWeight="1"
+                    app:layout_rowWeight="1"
                     app:cardElevation="4dp"
                     app:cardCornerRadius="8dp"
                     app:cardBackgroundColor="@color/accent_brown"
@@ -286,19 +293,56 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Panel Admin"
-                            android:textSize="16sp"
+                            android:textSize="14sp"
                             android:textStyle="bold"
                             android:textColor="@color/white"
                             android:gravity="center"/>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
-                <!-- Acerca de -->
+                <!-- Mis Préstamos (7) -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
                     android:layout_height="150dp"
                     android:layout_margin="8dp"
                     app:layout_columnWeight="1"
+                    app:layout_rowWeight="1"
+                    app:cardElevation="4dp"
+                    app:cardCornerRadius="8dp"
+                    app:cardBackgroundColor="@color/white">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="📚"
+                            android:textSize="48sp"
+                            android:layout_marginBottom="8dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Mis Préstamos"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/colorPrimary"
+                            android:gravity="center"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Acerca de (8) -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="0dp"
+                    android:layout_height="150dp"
+                    android:layout_margin="8dp"
+                    app:layout_columnWeight="1"
+                    app:layout_rowWeight="1"
                     app:cardElevation="4dp"
                     app:cardCornerRadius="8dp"
                     app:cardBackgroundColor="@color/white">
@@ -321,7 +365,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Acerca de"
-                            android:textSize="16sp"
+                            android:textSize="14sp"
                             android:textStyle="bold"
                             android:textColor="@color/colorPrimary"
                             android:gravity="center"/>

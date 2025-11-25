@@ -3,179 +3,161 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
-    android:background="@color/colorBackground">
+    android:background="@color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="16dp">
 
 
-        <TextView
+        <!-- Toolbar -->
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Gestión de Préstamos"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:layout_marginBottom="24dp"
-            android:textColor="@color/colorTextPrimary" />
-
-        <!-- Formulario de Préstamo -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Realizar Nuevo Préstamo"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp"
-            android:textColor="@color/colorTextPrimary" />
-
-        <!-- Usuario -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Usuario *"
-            android:textSize="14sp"
-            android:textColor="@color/colorTextSecondary"
-            android:layout_marginBottom="4dp" />
-
-        <Spinner
-            android:id="@+id/spinnerUsuario"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:background="@drawable/spinner_background" />
-
-        <!-- Libro -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Libro Disponible *"
-            android:textSize="14sp"
-            android:textColor="@color/colorTextSecondary"
-            android:layout_marginBottom="4dp" />
-
-        <Spinner
-            android:id="@+id/spinnerLibro"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:background="@drawable/spinner_background" />
-
-        <!-- Fecha Préstamo -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Fecha de Préstamo *"
-            android:textSize="14sp"
-            android:textColor="@color/colorTextSecondary"
-            android:layout_marginBottom="4dp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="12dp">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etFechaPrestamo"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:focusable="false"
-                android:clickable="false"
-                android:background="@drawable/spinner_background"
-                android:padding="16dp" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSeleccionarFechaPrestamo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:layout_marginStart="8dp"
-                android:backgroundTint="@color/colorPrimary" />
-
-        </LinearLayout>
-
-        <!-- Fecha Devolución -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Fecha de Devolución *"
-            android:textSize="14sp"
-            android:textColor="@color/colorTextSecondary"
-            android:layout_marginBottom="4dp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="16dp">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etFechaDevolucion"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:focusable="false"
-                android:clickable="false"
-                android:background="@drawable/spinner_background"
-                android:padding="16dp" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSeleccionarFechaDevolucion"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:layout_marginStart="8dp"
-                android:backgroundTint="@color/colorPrimary" />
-
-        </LinearLayout>
-
-        <!-- Botón Realizar Préstamo -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnRealizarPrestamo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text=" Realizar Préstamo"
-            android:layout_marginBottom="24dp"
-            android:backgroundTint="@color/colorPrimary"
-            android:textColor="@color/white" />
-
-        <!-- Separador -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
             android:background="@color/light_brown"
-            android:layout_marginBottom="16dp" />
+            android:title="Gestión de Préstamos"
+            android:titleTextColor="@color/white"
+            app:titleTextColor="@color/white" />
 
 
-        <TextView
+        <!-- CARD: Registrar préstamo -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Préstamos Activos"
-            android:textSize="18sp"
+            android:layout_marginTop="16dp"
+            app:cardElevation="5dp"
+            app:cardCornerRadius="10dp"
+            app:cardBackgroundColor="@color/light_brown">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+
+                <!-- Spinner Usuario -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Seleccione Usuario"
+                    android:textStyle="bold"
+                    android:textSize="16dp"
+                    android:textColor="@color/black" />
+
+                <Spinner
+                    android:id="@+id/spinnerUsuario"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp" />
+
+
+                <!-- Spinner Libro -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Seleccione Libro"
+                    android:textStyle="bold"
+                    android:textSize="16dp"
+                    android:textColor="@color/black" />
+
+                <Spinner
+                    android:id="@+id/spinnerBook"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp" />
+
+
+                <!-- Fecha préstamo -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="16dp">
+
+                    <EditText
+                        android:id="@+id/etFechaPrestamo"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:hint="Fecha Préstamo"
+                        android:focusable="false" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSeleccionarFechaPrestamo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Elegir" />
+                </LinearLayout>
+
+
+                <!-- Fecha devolución -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="12dp">
+
+                    <EditText
+                        android:id="@+id/etFechaDevolucion"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:hint="Fecha Devolución"
+                        android:focusable="false" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSeleccionarFechaDevolucion"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Elegir" />
+                </LinearLayout>
+
+
+                <!-- Botón Realizar Préstamo -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnRealizarPrestamo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="Registrar Préstamo"
+                    android:backgroundTint="@color/dark_brown"
+                    android:textColor="@color/white" />
+
+                <!-- Botón Regresar -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnVolver"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Volver"
+                    android:backgroundTint="@color/black"
+                    android:textColor="@color/white" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+
+        <!-- LISTA DINÁMICA DE PRÉSTAMOS -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Préstamos Registrados"
+            android:textSize="18dp"
             android:textStyle="bold"
-            android:layout_marginBottom="16dp"
-            android:textColor="@color/colorTextPrimary" />
+            android:textColor="@color/black" />
 
         <LinearLayout
             android:id="@+id/layoutListaPrestamos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginBottom="16dp" />
-
-        <!-- Botón Volver -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnVolver"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="⬅ Volver al menu"
-            android:backgroundTint="@color/accent_brown"
-            android:textColor="@color/white" />
+            android:layout_marginTop="10dp" />
 
     </LinearLayout>
 

@@ -28,6 +28,11 @@ import java.util.*;
 import android.content.DialogInterface;
 import androidx.appcompat.app.AlertDialog;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
+import android.graphics.drawable.Drawable;
+
 public class BookManagementActivity extends AppCompatActivity {
 
     // Campos obligatorios
@@ -68,7 +73,10 @@ public class BookManagementActivity extends AppCompatActivity {
         initializeViews();
         setupSpinners();
         setupButtonListeners();
+
+        // ✅ IMPORTANTE: Cargar datos de sugerencia ANTES de cargar la lista
         cargarDatosDesdeSugerencia();
+
         cargarListaLibros();
     }
 
@@ -505,13 +513,27 @@ public class BookManagementActivity extends AppCompatActivity {
     private void cargarDatosDesdeSugerencia() {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
+            // Datos básicos
             String tituloSugerencia = extras.getString("titulo_sugerencia");
             String autorSugerencia = extras.getString("autor_sugerencia");
             String categoriaSugerencia = extras.getString("categoria_sugerencia");
 
-            if (tituloSugerencia != null) etTitulo.setText(tituloSugerencia);
-            if (autorSugerencia != null) etAutor.setText(autorSugerencia);
-            if (categoriaSugerencia != null) {
+            // ✅ NUEVOS DATOS: edición, ISBN, año, imagen
+            String edicionSugerencia = extras.getString("edicion_sugerencia");
+            String isbnSugerencia = extras.getString("isbn_sugerencia");
+            String yearSugerencia = extras.getString("year_sugerencia");
+            String coverUrlSugerencia = extras.getString("cover_url_sugerencia");
+
+            // ✅ Pre-llenar campos básicos
+            if (tituloSugerencia != null && !tituloSugerencia.isEmpty()) {
+                etTitulo.setText(tituloSugerencia);
+            }
+
+            if (autorSugerencia != null && !autorSugerencia.isEmpty()) {
+                etAutor.setText(autorSugerencia);
+            }
+
+            if (categoriaSugerencia != null && !categoriaSugerencia.isEmpty()) {
                 for (int i = 0; i < categorias.length; i++) {
                     if (categorias[i].equals(categoriaSugerencia)) {
                         spinnerCategoria.setSelection(i);
@@ -519,6 +541,75 @@ public class BookManagementActivity extends AppCompatActivity {
                     }
                 }
             }
+
+            // ✅ Pre-llenar EDICIÓN
+            if (edicionSugerencia != null && !edicionSugerencia.isEmpty()) {
+                etNumeroEdicion.setText(edicionSugerencia);
+                Toast.makeText(this, "✅ Edición cargada: " + edicionSugerencia,
+                        Toast.LENGTH_SHORT).show();
+            }
+
+            // ✅ Pre-llenar ISBN
+            if (isbnSugerencia != null && !isbnSugerencia.isEmpty()) {
+                etIsbn.setText(isbnSugerencia);
+                Toast.makeText(this, "✅ ISBN cargado: " + isbnSugerencia,
+                        Toast.LENGTH_SHORT).show();
+            }
+
+            // ✅ Pre-llenar AÑO
+            if (yearSugerencia != null && !yearSugerencia.isEmpty()) {
+                etAnio.setText(yearSugerencia);
+                Toast.makeText(this, "✅ Año cargado: " + yearSugerencia,
+                        Toast.LENGTH_SHORT).show();
+            }
+
+            // ✅ DESCARGAR Y MOSTRAR IMAGEN de la sugerencia
+            if (coverUrlSugerencia != null && !coverUrlSugerencia.isEmpty()) {
+                descargarImagenDeSugerencia(coverUrlSugerencia);
+            }
+
+            // Mensaje informativo
+            Toast.makeText(this,
+                    "📝 Datos cargados desde sugerencia. Completa los campos faltantes.",
+                    Toast.LENGTH_LONG).show();
         }
+    }
+
+    // ✅ NUEVO MÉTODO: Descargar imagen desde Firebase Storage
+    private void descargarImagenDeSugerencia(String imageUrl) {
+        // Mostrar indicador de carga
+        Toast.makeText(this, "⏳ Descargando imagen de portada...", Toast.LENGTH_SHORT).show();
+
+        Glide.with(this)
+                .asBitmap()
+                .load(imageUrl)
+                .timeout(15000) // Timeout de 15 segundos
+                .into(new CustomTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(Bitmap bitmap, Transition<? super Bitmap> transition) {
+                        // Imagen descargada exitosamente
+                        ivFotoLibro.setImageBitmap(bitmap);
+                        fotoBase64 = bitmapToBase64(bitmap);
+
+                        Toast.makeText(BookManagementActivity.this,
+                                "✅ Imagen de portada cargada",
+                                Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onLoadFailed(Drawable errorDrawable) {
+                        // Error al descargar imagen
+                        Toast.makeText(BookManagementActivity.this,
+                                "⚠️ No se pudo cargar la imagen. Puedes agregar una nueva.",
+                                Toast.LENGTH_LONG).show();
+
+                        ivFotoLibro.setImageResource(R.drawable.ic_camera);
+                    }
+
+                    @Override
+                    public void onLoadCleared(Drawable placeholder) {
+                        // Cleanup si es necesario
+                    }
+                });
     }
 }

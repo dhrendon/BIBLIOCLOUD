@@ -11,11 +11,12 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- Título -->
         <TextView
             android:id="@+id/tvBranchName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Inventario de Sucursal"
+            android:text="📚 Inventario de Sucursal"
             android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="@color/colorPrimary"
@@ -32,10 +33,94 @@
             android:gravity="center"
             android:layout_marginBottom="24dp"/>
 
+        <!-- FECHAS DEL PRÉSTAMO -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📅 Fecha del Préstamo"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"/>
+
+        <EditText
+            android:id="@+id/etFechaPrestamo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:focusable="false"
+            android:background="@drawable/edittext_background"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSeleccionarFechaPrestamo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📅 Seleccionar Fecha de Préstamo"
+            app:backgroundTint="@color/colorPrimary"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- FECHA DE DEVOLUCIÓN -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📅 Fecha de Devolución"
+            android:textSize="14sp"
+            android:textStyle="bold"/>
+
+        <EditText
+            android:id="@+id/etFechaDevolucion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="false"
+            android:inputType="text"
+            android:background="@drawable/edittext_background"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSeleccionarFechaDevolucion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📅 Seleccionar Fecha de Devolución"
+            app:backgroundTint="@color/colorPrimary"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- ========== SECCIÓN PARA PRÉSTAMOS ========== -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📘 Realizar Préstamo"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimary"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Botón Realizar Préstamo -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRealizarPrestamo"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="📘 Registrar Préstamo"
+            android:textSize="16sp"
+            app:backgroundTint="@color/colorPrimary"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- Lista de Préstamos -->
+        <LinearLayout
+            android:id="@+id/layoutListaPrestamos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="24dp"/>
+
+
+        <!-- ========== FORMULARIO DE AGREGAR LIBRO ========== -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="24dp"
             app:cardElevation="4dp"
             app:cardCornerRadius="8dp"
             app:cardBackgroundColor="@color/white">
@@ -49,94 +134,103 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Agregar Libro al Inventario"
+                    android:text="➕ Agregar Libro al Inventario"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:textColor="@color/colorPrimary"
                     android:layout_marginBottom="16dp"/>
 
+                <!-- Seleccionar Libro -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Libro"
+                    android:text="📖 Seleccionar Libro"
+                    android:textSize="14sp"
                     android:textStyle="bold"
-                    android:layout_marginBottom="4dp"/>
+                    android:layout_marginBottom="8dp"/>
 
                 <Spinner
                     android:id="@+id/spinnerBook"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
+                    android:minHeight="48dp"
                     android:padding="12dp"
-                    android:background="@color/light_brown"/>
+                    android:background="@drawable/spinner_background"
+                    android:layout_marginBottom="16dp"/>
 
+                <!-- Ubicación en Anaquel -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="📍 Ubicación Física"
+                    android:text="📍 Ubicación en Anaquel"
+                    android:textSize="14sp"
                     android:textStyle="bold"
-                    android:textColor="@color/colorPrimary"
-                    android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"/>
 
+                <!-- Número de Anaquel -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:hint="Número de Anaquel (ej: A-01)">
+                    android:hint="Número de anaquel (ej: A-01)"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_marginBottom="12dp">
 
-                    <com.google.android.material.textfield.TextInputEditText
+                    <EditText
                         android:id="@+id/etShelfNumber"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="text"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!-- Sección del Anaquel -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Sección"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="4dp"/>
+                    android:textSize="14sp"
+                    android:layout_marginBottom="8dp"/>
 
                 <Spinner
                     android:id="@+id/spinnerShelfSection"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
+                    android:minHeight="48dp"
                     android:padding="12dp"
-                    android:background="@color/light_brown"/>
+                    android:background="@drawable/spinner_background"
+                    android:layout_marginBottom="12dp"/>
 
+                <!-- Nivel del Anaquel -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:hint="Nivel del Anaquel (1-5)">
+                    android:hint="Nivel (1-5)"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_marginBottom="16dp">
 
-                    <com.google.android.material.textfield.TextInputEditText
+                    <EditText
                         android:id="@+id/etShelfLevel"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="number"
-                        android:text="1"/>
+                        android:inputType="number"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!-- Stock y Disponibilidad -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="📦 Inventario"
+                    android:textSize="14sp"
                     android:textStyle="bold"
-                    android:textColor="@color/colorPrimary"
-                    android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"/>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:hint="Cantidad de Copias Físicas">
+                    android:hint="Stock físico (cantidad)"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_marginBottom="12dp">
 
-                    <com.google.android.material.textfield.TextInputEditText
+                    <EditText
                         android:id="@+id/etPhysicalStock"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -147,32 +241,33 @@
                     android:id="@+id/cbOnlineAvailable"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Disponible en formato digital"
+                    android:text="🌐 Disponible en formato digital"
                     android:layout_marginBottom="16dp"/>
 
+                <!-- Precio -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="💰 Precios"
+                    android:textSize="14sp"
                     android:textStyle="bold"
-                    android:textColor="@color/colorPrimary"
-                    android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"/>
 
                 <CheckBox
                     android:id="@+id/cbForSale"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Disponible para venta"
-                    android:layout_marginBottom="8dp"/>
+                    android:text="🛒 Disponible para venta"
+                    android:layout_marginBottom="12dp"/>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:hint="Precio de Venta (MXN)">
+                    android:hint="Precio de venta (MXN)"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_marginBottom="12dp">
 
-                    <com.google.android.material.textfield.TextInputEditText
+                    <EditText
                         android:id="@+id/etSalePrice"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -183,30 +278,34 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:hint="Precio de Renta (MXN)">
+                    android:hint="Precio de renta (MXN) - Opcional"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_marginBottom="16dp">
 
-                    <com.google.android.material.textfield.TextInputEditText
+                    <EditText
                         android:id="@+id/etRentalPrice"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="numberDecimal"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!-- Botón Agregar -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnAddInventory"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Agregar al Inventario"
+                    android:layout_height="60dp"
+                    android:text="✅ Agregar al Inventario"
+                    android:textSize="16sp"
                     app:backgroundTint="@color/colorPrimary"/>
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
+        <!-- ========== LISTA DE INVENTARIO ========== -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Libros en Inventario"
+            android:text="📋 Libros en Inventario"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="@color/colorPrimary"
@@ -218,13 +317,16 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"/>
 
+        <!-- Botón Volver -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnBack"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Volver"
-            android:layout_marginTop="16dp"
-            app:backgroundTint="@color/accent_brown"/>
+            android:layout_height="60dp"
+            android:text="⬅ Volver"
+            android:textSize="16sp"
+            android:layout_marginTop="24dp"
+            app:backgroundTint="@color/accent_brown"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
 
     </LinearLayout>
 </ScrollView>

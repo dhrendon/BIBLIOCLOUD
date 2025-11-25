@@ -135,7 +135,10 @@ public class MainActivity extends AppCompatActivity {
                             Toast.LENGTH_SHORT).show();
                 }
                 break;
-            case 7: // Acerca de
+            case 7: // Mis Préstamos
+                startActivity(new Intent(this, MyLoansActivity.class));
+                break;
+            case 8: // Acerca de
                 Toast.makeText(this, "BiblioCloud v2.0 - Sistema de Gestión Bibliotecaria",
                         Toast.LENGTH_SHORT).show();
                 break;

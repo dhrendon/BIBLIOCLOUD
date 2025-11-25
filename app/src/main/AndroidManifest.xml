@@ -77,6 +77,13 @@
 
         <activity android:name=".BookManagementActivity" android:exported="false"/>
         <activity android:name=".LoanManagementActivity" android:exported="false"/>
+
+        <!-- 🆕 AGREGAR AdminAssignLoanActivity -->
+        <activity
+            android:name=".AdminAssignLoanActivity"
+            android:exported="false"
+            android:label="Asignar Préstamo"/>
+
         <activity android:name=".SuggestionsManagementActivity" android:exported="false"/>
         <activity android:name=".BranchManagementActivity" android:exported="false"/>
         <activity android:name=".BranchLocationPickerActivity" android:exported="false"/>
@@ -108,6 +115,17 @@
             android:parentActivityName=".CashierDashboardActivity"/>
         <activity android:name=".UserPaymentHistoryActivity"
             android:parentActivityName=".MainActivity"/>
+
+        <!-- Agregar dentro de <application> -->
+        <activity
+            android:name=".LoanRequestActivity"
+            android:label="Solicitar Préstamo"
+            android:theme="@style/Theme.BiblioCloud" />
+
+        <activity
+            android:name=".MyLoansActivity"
+            android:label="Mis Préstamos"
+            android:theme="@style/Theme.BiblioCloud" />
         <!-- ========================================= -->
         <!-- Servicios -->
         <!-- ========================================= -->

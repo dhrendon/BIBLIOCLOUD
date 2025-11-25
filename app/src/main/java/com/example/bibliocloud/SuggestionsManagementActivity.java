@@ -9,10 +9,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -81,10 +83,10 @@ public class SuggestionsManagementActivity extends AppCompatActivity {
                 String autor = doc.getString("author");
                 String categoria = doc.getString("category");
                 String comentarios = doc.getString("comments");
-                String edicion = doc.getString("edition"); // 🆕
-                String isbn = doc.getString("isbn"); // 🆕
-                String year = doc.getString("year"); // 🆕
-                String coverImageUrl = doc.getString("coverImageUrl"); // 🆕
+                String edicion = doc.getString("edition");
+                String isbn = doc.getString("isbn");
+                String year = doc.getString("year");
+                String coverImageUrl = doc.getString("coverImageUrl");
                 String estado = doc.getString("status");
                 String usuario = doc.getString("userEmail");
 
@@ -166,12 +168,11 @@ public class SuggestionsManagementActivity extends AppCompatActivity {
         cardView.setRadius(8);
         cardView.setCardBackgroundColor(getResources().getColor(R.color.light_brown));
 
-        // 🆕 Layout horizontal para imagen + contenido
         LinearLayout mainLayout = new LinearLayout(this);
         mainLayout.setOrientation(LinearLayout.HORIZONTAL);
         mainLayout.setPadding(16, 16, 16, 16);
 
-        // 🆕 Imagen de portada (si existe)
+        // ✅ Imagen con validación y timeout
         if (coverImageUrl != null && !coverImageUrl.isEmpty()) {
             ImageView ivPortada = new ImageView(this);
             LinearLayout.LayoutParams imgParams = new LinearLayout.LayoutParams(120, 160);
@@ -183,12 +184,13 @@ public class SuggestionsManagementActivity extends AppCompatActivity {
                     .load(coverImageUrl)
                     .placeholder(R.drawable.ic_book_placeholder)
                     .error(R.drawable.ic_book_placeholder)
+                    .timeout(10000) // ✅ Timeout de 10 segundos
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(ivPortada);
 
             mainLayout.addView(ivPortada);
         }
 
-        // Layout vertical para información del libro
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams contentParams = new LinearLayout.LayoutParams(
@@ -196,21 +198,21 @@ public class SuggestionsManagementActivity extends AppCompatActivity {
         );
         layout.setLayoutParams(contentParams);
 
+        // ✅ Validar datos antes de mostrar
         TextView tvTitulo = new TextView(this);
-        tvTitulo.setText(titulo);
+        tvTitulo.setText(titulo != null && !titulo.isEmpty() ? titulo : "Sin título");
         tvTitulo.setTextSize(18);
         tvTitulo.setTypeface(null, android.graphics.Typeface.BOLD);
         layout.addView(tvTitulo);
 
         TextView tvAutor = new TextView(this);
-        tvAutor.setText("✍️ " + autor);
+        tvAutor.setText("✍️ " + (autor != null && !autor.isEmpty() ? autor : "Sin autor"));
         layout.addView(tvAutor);
 
         TextView tvCategoria = new TextView(this);
-        tvCategoria.setText("📚 " + categoria);
+        tvCategoria.setText("📚 " + (categoria != null ? categoria : "Sin categoría"));
         layout.addView(tvCategoria);
 
-        // 🆕 Mostrar edición si existe
         if (edicion != null && !edicion.isEmpty()) {
             TextView tvEdicion = new TextView(this);
             tvEdicion.setText("📖 Edición: " + edicion);
@@ -219,7 +221,6 @@ public class SuggestionsManagementActivity extends AppCompatActivity {
             layout.addView(tvEdicion);
         }
 
-        // 🆕 Mostrar ISBN si existe
         if (isbn != null && !isbn.isEmpty()) {
             TextView tvIsbn = new TextView(this);
             tvIsbn.setText("🔢 ISBN: " + isbn);
@@ -228,7 +229,6 @@ public class SuggestionsManagementActivity extends AppCompatActivity {
             layout.addView(tvIsbn);
         }
 
-        // 🆕 Mostrar año si existe
         if (year != null && !year.isEmpty()) {
             TextView tvYear = new TextView(this);
             tvYear.setText("📅 Año: " + year);
@@ -251,7 +251,7 @@ public class SuggestionsManagementActivity extends AppCompatActivity {
         layout.addView(tvInfo);
 
         TextView tvEstado = new TextView(this);
-        tvEstado.setText("🔄 Estado: " + estado);
+        tvEstado.setText("📄 Estado: " + estado);
         tvEstado.setTextSize(13);
         switch (estado) {
             case "Pendiente": tvEstado.setTextColor(getResources().getColor(R.color.orange)); break;
@@ -260,7 +260,7 @@ public class SuggestionsManagementActivity extends AppCompatActivity {
         }
         layout.addView(tvEstado);
 
-        // Botones de acción
+        // Botones según estado
         if ("Pendiente".equals(estado)) {
             LinearLayout botones = new LinearLayout(this);
             botones.setOrientation(LinearLayout.HORIZONTAL);
@@ -270,30 +270,122 @@ public class SuggestionsManagementActivity extends AppCompatActivity {
             btnAprobar.setText("Aprobar");
             btnAprobar.setBackgroundColor(getResources().getColor(R.color.green));
             btnAprobar.setTextColor(getResources().getColor(R.color.white));
-            btnAprobar.setOnClickListener(v -> actualizarEstado(id, "Aprobada"));
+            btnAprobar.setOnClickListener(v -> {
+                // ✅ Validar ISBN duplicado antes de aprobar
+                if (isbn != null && !isbn.isEmpty()) {
+                    validarISBNDuplicado(isbn, id, titulo, autor, categoria,
+                            edicion, year, coverImageUrl);
+                } else {
+                    confirmarAprobacion(id);
+                }
+            });
 
             Button btnRechazar = new Button(this);
             btnRechazar.setText("Rechazar");
             btnRechazar.setBackgroundColor(getResources().getColor(R.color.red));
             btnRechazar.setTextColor(getResources().getColor(R.color.white));
-            btnRechazar.setOnClickListener(v -> actualizarEstado(id, "Rechazada"));
+            btnRechazar.setOnClickListener(v -> confirmarRechazo(id));
 
             botones.addView(btnAprobar);
             botones.addView(btnRechazar);
             layout.addView(botones);
+
         } else if ("Aprobada".equals(estado)) {
             Button btnAgregar = new Button(this);
             btnAgregar.setText("Agregar al Catálogo");
             btnAgregar.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
             btnAgregar.setTextColor(getResources().getColor(R.color.white));
-            btnAgregar.setOnClickListener(v -> agregarLibroDesdeSugerencia(titulo, autor, categoria,
-                    edicion, isbn, year, coverImageUrl));
+            btnAgregar.setOnClickListener(v -> {
+                // ✅ Validar datos antes de enviar
+                if (validarDatosParaCatalogo(titulo, autor, categoria)) {
+                    agregarLibroDesdeSugerencia(titulo, autor, categoria,
+                            edicion, isbn, year, coverImageUrl);
+                }
+            });
             layout.addView(btnAgregar);
         }
 
         mainLayout.addView(layout);
         cardView.addView(mainLayout);
         return cardView;
+    }
+
+    // ✅ NUEVO: Validar ISBN duplicado
+    private void validarISBNDuplicado(String isbn, String sugerenciaId, String titulo,
+                                      String autor, String categoria, String edicion,
+                                      String year, String coverImageUrl) {
+        // Limpiar ISBN
+        String isbnLimpio = isbn.replaceAll("[\\s-]", "");
+
+        db.collection("libros")
+                .whereEqualTo("isbn", isbnLimpio)
+                .get()
+                .addOnSuccessListener(query -> {
+                    if (!query.isEmpty()) {
+                        // ISBN duplicado
+                        new AlertDialog.Builder(this)
+                                .setTitle("⚠️ ISBN Duplicado")
+                                .setMessage("Ya existe un libro con este ISBN en el catálogo:\n\n" +
+                                        "ISBN: " + isbn + "\n\n" +
+                                        "¿Deseas aprobar la sugerencia de todas formas?")
+                                .setPositiveButton("Sí, aprobar", (dialog, which) -> {
+                                    confirmarAprobacion(sugerenciaId);
+                                })
+                                .setNegativeButton("Cancelar", null)
+                                .show();
+                    } else {
+                        // ISBN único, aprobar directamente
+                        confirmarAprobacion(sugerenciaId);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Error al validar ISBN: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    // ✅ NUEVO: Confirmación antes de aprobar
+    private void confirmarAprobacion(String id) {
+        new AlertDialog.Builder(this)
+                .setTitle("Confirmar aprobación")
+                .setMessage("¿Marcar esta sugerencia como aprobada?")
+                .setPositiveButton("✅ Aprobar", (dialog, which) -> {
+                    actualizarEstado(id, "Aprobada");
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
+    // ✅ NUEVO: Confirmación antes de rechazar
+    private void confirmarRechazo(String id) {
+        new AlertDialog.Builder(this)
+                .setTitle("Confirmar rechazo")
+                .setMessage("¿Marcar esta sugerencia como rechazada?")
+                .setPositiveButton("❌ Rechazar", (dialog, which) -> {
+                    actualizarEstado(id, "Rechazada");
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
+    // ✅ NUEVO: Validar datos antes de agregar al catálogo
+    private boolean validarDatosParaCatalogo(String titulo, String autor, String categoria) {
+        if (titulo == null || titulo.trim().isEmpty()) {
+            Toast.makeText(this, "⚠️ Error: Título no válido", Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        if (autor == null || autor.trim().isEmpty()) {
+            Toast.makeText(this, "⚠️ Error: Autor no válido", Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        if (categoria == null || categoria.trim().isEmpty()) {
+            Toast.makeText(this, "⚠️ Error: Categoría no válida", Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        return true;
     }
 
     private void actualizarEstado(String id, String nuevoEstado) {
@@ -315,10 +407,10 @@ public class SuggestionsManagementActivity extends AppCompatActivity {
         intent.putExtra("titulo_sugerencia", titulo);
         intent.putExtra("autor_sugerencia", autor);
         intent.putExtra("categoria_sugerencia", categoria);
-        intent.putExtra("edicion_sugerencia", edicion); // 🆕
-        intent.putExtra("isbn_sugerencia", isbn); // 🆕
-        intent.putExtra("year_sugerencia", year); // 🆕
-        intent.putExtra("cover_url_sugerencia", coverImageUrl); // 🆕
+        intent.putExtra("edicion_sugerencia", edicion);
+        intent.putExtra("isbn_sugerencia", isbn);
+        intent.putExtra("year_sugerencia", year);
+        intent.putExtra("cover_url_sugerencia", coverImageUrl);
         startActivity(intent);
     }
 }

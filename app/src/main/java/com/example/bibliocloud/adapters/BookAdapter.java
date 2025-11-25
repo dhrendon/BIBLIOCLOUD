@@ -160,27 +160,30 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
             }
         }
 
-        private void loadBookImage(String imageResource) {
+        private void loadBookImage(String fotoBase64) {
             try {
-                if (imageResource != null && !imageResource.isEmpty()) {
-                    // Primero intentar cargar desde recursos
-                    int resourceId = itemView.getContext().getResources()
-                            .getIdentifier(imageResource, "drawable",
-                                    itemView.getContext().getPackageName());
+                if (fotoBase64 != null && !fotoBase64.isEmpty()) {
+                    // 🔥 SOLUCIÓN: Decodificar Base64 a Bitmap
+                    byte[] decodedBytes = android.util.Base64.decode(fotoBase64, android.util.Base64.DEFAULT);
+                    android.graphics.Bitmap bitmap = android.graphics.BitmapFactory.decodeByteArray(
+                            decodedBytes, 0, decodedBytes.length
+                    );
 
-                    if (resourceId != 0) {
-                        imgBook.setImageResource(resourceId);
+                    if (bitmap != null) {
+                        imgBook.setImageBitmap(bitmap);
                     } else {
-                        // Si no se encuentra en recursos, podría ser una URL
-                        // Aquí podrías usar Glide o Picasso para cargar desde URL
-                        imgBook.setImageResource(android.R.drawable.ic_menu_gallery);
+                        // Si falla la decodificación, mostrar placeholder
+                        imgBook.setImageResource(R.drawable.ic_book_placeholder);
+                        Log.w("BookAdapter", "No se pudo decodificar la imagen Base64");
                     }
                 } else {
-                    imgBook.setImageResource(android.R.drawable.ic_menu_gallery);
+                    // Sin imagen, mostrar placeholder
+                    imgBook.setImageResource(R.drawable.ic_book_placeholder);
                 }
             } catch (Exception e) {
-                imgBook.setImageResource(android.R.drawable.ic_menu_gallery);
-                Log.e("BookAdapter", "Error cargando imagen: " + e.getMessage());
+                // Error al decodificar, mostrar placeholder
+                imgBook.setImageResource(R.drawable.ic_book_placeholder);
+                Log.e("BookAdapter", "Error cargando imagen Base64: " + e.getMessage(), e);
             }
         }
 

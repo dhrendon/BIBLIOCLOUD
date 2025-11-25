@@ -15,6 +15,7 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.firestore.*;
 import java.util.*;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class BranchBooksCatalogActivity extends AppCompatActivity {
 
@@ -243,7 +244,23 @@ public class BranchBooksCatalogActivity extends AppCompatActivity {
     }
 
     private void reserveBook(BookWithInventory item) {
-        Toast.makeText(this, "Función de reserva - Próximamente", Toast.LENGTH_SHORT).show();
+        // Validar que el usuario esté autenticado
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            Toast.makeText(this, "⚠️ Debes iniciar sesión para solicitar un préstamo",
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        // Abrir Activity de solicitud de préstamo
+        Intent intent = new Intent(this, LoanRequestActivity.class);
+        intent.putExtra("bookId", item.getBook().getId());
+        intent.putExtra("inventoryId", item.getInventory().getId());
+        intent.putExtra("bookTitle", item.getBook().getTitle());
+        intent.putExtra("bookAuthor", item.getBook().getAuthor());
+        intent.putExtra("branchId", item.getInventory().getBranchId());
+        intent.putExtra("branchName", item.getInventory().getBranchName());
+        intent.putExtra("availableStock", item.getInventory().getAvailablePhysical());
+        startActivity(intent);
     }
 
     // Clase auxiliar
