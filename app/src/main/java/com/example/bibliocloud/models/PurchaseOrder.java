@@ -15,6 +15,10 @@ public class PurchaseOrder {
     private String userEmail;
     private String userName;
 
+    // 🔥 NUEVO: Sucursal de la orden
+    private String branchId;
+    private String branchName;
+
     private List<PurchaseItem> items;
     private double subtotal;
     private double tax;
@@ -61,6 +65,13 @@ public class PurchaseOrder {
 
     public String getUserName() { return userName; }
     public void setUserName(String userName) { this.userName = userName; }
+
+    // 🔥 NUEVOS GETTERS/SETTERS PARA SUCURSAL
+    public String getBranchId() { return branchId; }
+    public void setBranchId(String branchId) { this.branchId = branchId; }
+
+    public String getBranchName() { return branchName; }
+    public void setBranchName(String branchName) { this.branchName = branchName; }
 
     public List<PurchaseItem> getItems() { return items; }
     public void setItems(List<PurchaseItem> items) { this.items = items; }
@@ -110,6 +121,13 @@ public class PurchaseOrder {
     // Métodos útiles
     public void addItem(PurchaseItem item) {
         items.add(item);
+
+        // 🔥 AUTOMÁTICO: Establecer branchId/branchName desde el primer item
+        if (items.size() == 1 && item.getBranchId() != null) {
+            this.branchId = item.getBranchId();
+            this.branchName = item.getBranchName();
+        }
+
         calculateTotals();
     }
 

@@ -286,13 +286,29 @@ public class PurchaseActivity extends AppCompatActivity {
         builder.show();
     }
 
+    // 🔥 FRAGMENTO CORREGIDO PARA PurchaseActivity.java
+// Reemplaza el método createPurchaseOrder()
+
     private void createPurchaseOrder(String address, String city, String state,
                                      String zipCode, String phone, String paymentMethod) {
+        Log.d(TAG, "========================================");
+        Log.d(TAG, "🛒 CREANDO ORDEN DE COMPRA");
+        Log.d(TAG, "   - BranchID: " + branchId);
+        Log.d(TAG, "   - BranchName: " + branchName);
+        Log.d(TAG, "========================================");
+
         PurchaseOrder order = new PurchaseOrder(
                 auth.getCurrentUser().getUid(),
                 auth.getCurrentUser().getEmail(),
                 auth.getCurrentUser().getDisplayName()
         );
+
+        // 🔥 CRÍTICO: Establecer branchId y branchName en la orden
+        order.setBranchId(branchId);
+        order.setBranchName(branchName);
+
+        Log.d(TAG, "✅ BranchId establecido en la orden: " + order.getBranchId());
+        Log.d(TAG, "✅ BranchName establecido en la orden: " + order.getBranchName());
 
         PurchaseOrder.PurchaseItem item = new PurchaseOrder.PurchaseItem(
                 bookId, bookTitle, bookAuthor, price, quantity, "Físico"
@@ -313,6 +329,7 @@ public class PurchaseActivity extends AppCompatActivity {
         calendar.add(Calendar.DAY_OF_YEAR, 7);
         order.setEstimatedDelivery(calendar.getTime());
 
+        Log.d(TAG, "📦 Orden configurada - Guardando en Firestore...");
         savePurchaseOrder(order);
     }
 

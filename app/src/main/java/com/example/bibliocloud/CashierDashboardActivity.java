@@ -177,26 +177,37 @@ public class CashierDashboardActivity extends AppCompatActivity {
     }
 
     private void loadPendingOrdersCount() {
+
+        if (branchId == null || branchId.isEmpty()) {
+            Log.e(TAG, "⚠️ No hay branchId asignado, imposible filtrar órdenes");
+            tvPendingOrders.setText("Órdenes pendientes: 0");
+            return;
+        }
+
         db.collection("compras")
                 .whereEqualTo("status", "Pendiente")
+                .whereEqualTo("branchId", branchId)   // 🔥 FILTRO CORRECTO
                 .addSnapshotListener((value, error) -> {
+
                     if (error != null) {
                         Log.e(TAG, "❌ Error cargando órdenes: " + error.getMessage());
                         tvPendingOrders.setText("Órdenes pendientes: 0");
                         return;
                     }
 
-                    if (value == null) {
-                        Log.w(TAG, "⚠️ Valor nulo al cargar órdenes");
+                    if (value == null || value.isEmpty()) {
+                        Log.d(TAG, "📭 No hay órdenes pendientes para esta sucursal");
                         tvPendingOrders.setText("Órdenes pendientes: 0");
                         return;
                     }
 
                     int count = value.size();
                     tvPendingOrders.setText("Órdenes pendientes: " + count);
-                    Log.d(TAG, "📋 Órdenes pendientes: " + count);
+
+                    Log.d(TAG, "📦 Órdenes pendientes para la sucursal " + branchId + ": " + count);
                 });
     }
+
 
     private void loadTodayPayments() {
         if (branchName == null || branchName.isEmpty()) {

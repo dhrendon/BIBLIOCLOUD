@@ -11,7 +11,7 @@ public class SuggestionRepository {
 
     public SuggestionRepository() {
         db = FirebaseFirestore.getInstance();
-        suggestionsRef = db.collection("suggestions");
+        suggestionsRef = db.collection("sugerencias"); // 🔄 Cambiado a "sugerencias" para coincidir con tu Activity
     }
 
     // Crear sugerencia
@@ -49,6 +49,16 @@ public class SuggestionRepository {
                 .addOnFailureListener(listener::onFailure);
     }
 
+    // Obtener sugerencias por email (más común en tu caso)
+    public void getSuggestionsByEmail(String userEmail, OnSuggestionsLoadedListener listener) {
+        suggestionsRef.whereEqualTo("userEmail", userEmail)
+                .orderBy("suggestionDate", Query.Direction.DESCENDING)
+                .get()
+                .addOnSuccessListener(querySnapshot ->
+                        listener.onSuggestionsLoaded(querySnapshot.toObjects(Suggestion.class)))
+                .addOnFailureListener(listener::onFailure);
+    }
+
     // Obtener sugerencias por estado
     public void getSuggestionsByStatus(String status, OnSuggestionsLoadedListener listener) {
         suggestionsRef.whereEqualTo("status", status)
@@ -75,7 +85,7 @@ public class SuggestionRepository {
                 .addOnFailureListener(listener::onFailure);
     }
 
-    // Interfaces
+    // ✅ Interfaces definidas correctamente dentro de la clase
     public interface OnCompleteListener {
         void onSuccess(String id);
         void onFailure(Exception e);
