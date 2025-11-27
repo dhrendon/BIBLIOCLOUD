@@ -1,8 +1,10 @@
 package com.example.bibliocloud;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.view.View;
+import android.util.Base64;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -13,8 +15,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -41,7 +41,7 @@ public class SuggestionsManagementActivity extends AppCompatActivity {
         initializeViews();
         setupFirebase();
         setupButtonListeners();
-        cargarListaSugerencias();
+        // ✅ NO cargar aquí, onResume() lo hará
     }
 
     private void initializeViews() {
@@ -59,42 +59,53 @@ public class SuggestionsManagementActivity extends AppCompatActivity {
     }
 
     private void cargarListaSugerencias() {
+        // ✅ CRÍTICO: Limpiar TODO antes de cargar
         layoutListaSugerencias.removeAllViews();
+        listaSugerencias.clear();
 
-        sugerenciasRef.get().addOnSuccessListener(query -> {
-            listaSugerencias.clear();
-            listaSugerencias.addAll(query.getDocuments());
+        sugerenciasRef
+                .orderBy("suggestionDate", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                .get()
+                .addOnSuccessListener(query -> {
+                    if (query.isEmpty()) {
+                        TextView tvEmpty = new TextView(this);
+                        tvEmpty.setText("No hay sugerencias registradas");
+                        tvEmpty.setTextColor(getResources().getColor(R.color.colorTextSecondary));
+                        tvEmpty.setTextSize(16);
+                        tvEmpty.setPadding(0, 32, 0, 0);
+                        layoutListaSugerencias.addView(tvEmpty);
+                        return;
+                    }
 
-            if (listaSugerencias.isEmpty()) {
-                TextView tvEmpty = new TextView(this);
-                tvEmpty.setText("No hay sugerencias registradas");
-                tvEmpty.setTextColor(getResources().getColor(R.color.colorTextSecondary));
-                tvEmpty.setTextSize(16);
-                tvEmpty.setPadding(0, 32, 0, 0);
-                layoutListaSugerencias.addView(tvEmpty);
-                return;
-            }
+                    // Agregar documentos a la lista
+                    listaSugerencias.addAll(query.getDocuments());
 
-            mostrarEstadisticas();
+                    // Mostrar estadísticas
+                    mostrarEstadisticas();
 
-            for (DocumentSnapshot doc : listaSugerencias) {
-                String id = doc.getId();
-                String titulo = doc.getString("title");
-                String autor = doc.getString("author");
-                String categoria = doc.getString("category");
-                String comentarios = doc.getString("comments");
-                String edicion = doc.getString("edition");
-                String isbn = doc.getString("isbn");
-                String year = doc.getString("year");
-                String coverImageUrl = doc.getString("coverImageUrl");
-                String estado = doc.getString("status");
-                String usuario = doc.getString("userEmail");
+                    // Crear tarjetas
+                    for (DocumentSnapshot doc : listaSugerencias) {
+                        String id = doc.getId();
+                        String titulo = doc.getString("title");
+                        String autor = doc.getString("author");
+                        String categoria = doc.getString("category");
+                        String comentarios = doc.getString("comments");
+                        String edicion = doc.getString("edition");
+                        String isbn = doc.getString("isbn");
+                        String year = doc.getString("year");
+                        String coverImageBase64 = doc.getString("coverImageBase64");
+                        String estado = doc.getString("status");
+                        String usuario = doc.getString("userEmail");
+                        Boolean agregadaCatalogo = doc.getBoolean("addedToCatalog");
 
-                CardView card = crearCardSugerencia(id, titulo, autor, categoria, comentarios,
-                        edicion, isbn, year, coverImageUrl, estado, usuario);
-                layoutListaSugerencias.addView(card);
-            }
-        }).addOnFailureListener(e -> Toast.makeText(this, "Error al cargar: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                        CardView card = crearCardSugerencia(id, titulo, autor, categoria, comentarios,
+                                edicion, isbn, year, coverImageBase64, estado, usuario, agregadaCatalogo);
+                        layoutListaSugerencias.addView(card);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Error al cargar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void mostrarEstadisticas() {
@@ -157,7 +168,8 @@ public class SuggestionsManagementActivity extends AppCompatActivity {
 
     private CardView crearCardSugerencia(String id, String titulo, String autor, String categoria,
                                          String comentarios, String edicion, String isbn, String year,
-                                         String coverImageUrl, String estado, String usuario) {
+                                         String coverImageBase64, String estado, String usuario,
+                                         Boolean agregadaCatalogo) {
         CardView cardView = new CardView(this);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
@@ -172,21 +184,24 @@ public class SuggestionsManagementActivity extends AppCompatActivity {
         mainLayout.setOrientation(LinearLayout.HORIZONTAL);
         mainLayout.setPadding(16, 16, 16, 16);
 
-        // ✅ Imagen con validación y timeout
-        if (coverImageUrl != null && !coverImageUrl.isEmpty()) {
+        // 📸 Imagen desde Base64
+        if (coverImageBase64 != null && !coverImageBase64.isEmpty()) {
             ImageView ivPortada = new ImageView(this);
             LinearLayout.LayoutParams imgParams = new LinearLayout.LayoutParams(120, 160);
             imgParams.setMargins(0, 0, 16, 0);
             ivPortada.setLayoutParams(imgParams);
             ivPortada.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
-            Glide.with(this)
-                    .load(coverImageUrl)
-                    .placeholder(R.drawable.ic_book_placeholder)
-                    .error(R.drawable.ic_book_placeholder)
-                    .timeout(10000) // ✅ Timeout de 10 segundos
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(ivPortada);
+            try {
+                Bitmap bitmap = base64ToBitmap(coverImageBase64);
+                if (bitmap != null) {
+                    ivPortada.setImageBitmap(bitmap);
+                } else {
+                    ivPortada.setImageResource(R.drawable.ic_book_placeholder);
+                }
+            } catch (Exception e) {
+                ivPortada.setImageResource(R.drawable.ic_book_placeholder);
+            }
 
             mainLayout.addView(ivPortada);
         }
@@ -198,7 +213,6 @@ public class SuggestionsManagementActivity extends AppCompatActivity {
         );
         layout.setLayoutParams(contentParams);
 
-        // ✅ Validar datos antes de mostrar
         TextView tvTitulo = new TextView(this);
         tvTitulo.setText(titulo != null && !titulo.isEmpty() ? titulo : "Sin título");
         tvTitulo.setTextSize(18);
@@ -260,49 +274,58 @@ public class SuggestionsManagementActivity extends AppCompatActivity {
         }
         layout.addView(tvEstado);
 
-        // Botones según estado
-        if ("Pendiente".equals(estado)) {
-            LinearLayout botones = new LinearLayout(this);
-            botones.setOrientation(LinearLayout.HORIZONTAL);
-            botones.setPadding(0, 12, 0, 0);
+        // ✅ Mostrar mensaje si ya fue agregada al catálogo
+        if (agregadaCatalogo != null && agregadaCatalogo) {
+            TextView tvAgregada = new TextView(this);
+            tvAgregada.setText("📖 ✅ Agregada al catálogo");
+            tvAgregada.setTextSize(14);
+            tvAgregada.setTypeface(null, android.graphics.Typeface.BOLD);
+            tvAgregada.setTextColor(getResources().getColor(R.color.colorPrimary));
+            tvAgregada.setPadding(0, 12, 0, 0);
+            layout.addView(tvAgregada);
+        } else {
+            // Botones según estado (solo si NO ha sido agregada)
+            if ("Pendiente".equals(estado)) {
+                LinearLayout botones = new LinearLayout(this);
+                botones.setOrientation(LinearLayout.HORIZONTAL);
+                botones.setPadding(0, 12, 0, 0);
 
-            Button btnAprobar = new Button(this);
-            btnAprobar.setText("Aprobar");
-            btnAprobar.setBackgroundColor(getResources().getColor(R.color.green));
-            btnAprobar.setTextColor(getResources().getColor(R.color.white));
-            btnAprobar.setOnClickListener(v -> {
-                // ✅ Validar ISBN duplicado antes de aprobar
-                if (isbn != null && !isbn.isEmpty()) {
-                    validarISBNDuplicado(isbn, id, titulo, autor, categoria,
-                            edicion, year, coverImageUrl);
-                } else {
-                    confirmarAprobacion(id);
-                }
-            });
+                Button btnAprobar = new Button(this);
+                btnAprobar.setText("Aprobar");
+                btnAprobar.setBackgroundColor(getResources().getColor(R.color.green));
+                btnAprobar.setTextColor(getResources().getColor(R.color.white));
+                btnAprobar.setOnClickListener(v -> {
+                    if (isbn != null && !isbn.isEmpty()) {
+                        validarISBNDuplicado(isbn, id, titulo, autor, categoria,
+                                edicion, year, coverImageBase64);
+                    } else {
+                        confirmarAprobacion(id);
+                    }
+                });
 
-            Button btnRechazar = new Button(this);
-            btnRechazar.setText("Rechazar");
-            btnRechazar.setBackgroundColor(getResources().getColor(R.color.red));
-            btnRechazar.setTextColor(getResources().getColor(R.color.white));
-            btnRechazar.setOnClickListener(v -> confirmarRechazo(id));
+                Button btnRechazar = new Button(this);
+                btnRechazar.setText("Rechazar");
+                btnRechazar.setBackgroundColor(getResources().getColor(R.color.red));
+                btnRechazar.setTextColor(getResources().getColor(R.color.white));
+                btnRechazar.setOnClickListener(v -> confirmarRechazo(id));
 
-            botones.addView(btnAprobar);
-            botones.addView(btnRechazar);
-            layout.addView(botones);
+                botones.addView(btnAprobar);
+                botones.addView(btnRechazar);
+                layout.addView(botones);
 
-        } else if ("Aprobada".equals(estado)) {
-            Button btnAgregar = new Button(this);
-            btnAgregar.setText("Agregar al Catálogo");
-            btnAgregar.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-            btnAgregar.setTextColor(getResources().getColor(R.color.white));
-            btnAgregar.setOnClickListener(v -> {
-                // ✅ Validar datos antes de enviar
-                if (validarDatosParaCatalogo(titulo, autor, categoria)) {
-                    agregarLibroDesdeSugerencia(titulo, autor, categoria,
-                            edicion, isbn, year, coverImageUrl);
-                }
-            });
-            layout.addView(btnAgregar);
+            } else if ("Aprobada".equals(estado)) {
+                Button btnAgregar = new Button(this);
+                btnAgregar.setText("Agregar al Catálogo");
+                btnAgregar.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                btnAgregar.setTextColor(getResources().getColor(R.color.white));
+                btnAgregar.setOnClickListener(v -> {
+                    if (validarDatosParaCatalogo(titulo, autor, categoria)) {
+                        agregarLibroDesdeSugerencia(id, titulo, autor, categoria,
+                                edicion, isbn, year, coverImageBase64);
+                    }
+                });
+                layout.addView(btnAgregar);
+            }
         }
 
         mainLayout.addView(layout);
@@ -310,11 +333,19 @@ public class SuggestionsManagementActivity extends AppCompatActivity {
         return cardView;
     }
 
-    // ✅ NUEVO: Validar ISBN duplicado
+    // 📸 Convertir Base64 a Bitmap
+    private Bitmap base64ToBitmap(String base64String) {
+        try {
+            byte[] decodedBytes = Base64.decode(base64String, Base64.DEFAULT);
+            return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     private void validarISBNDuplicado(String isbn, String sugerenciaId, String titulo,
                                       String autor, String categoria, String edicion,
-                                      String year, String coverImageUrl) {
-        // Limpiar ISBN
+                                      String year, String coverImageBase64) {
         String isbnLimpio = isbn.replaceAll("[\\s-]", "");
 
         db.collection("libros")
@@ -322,7 +353,6 @@ public class SuggestionsManagementActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(query -> {
                     if (!query.isEmpty()) {
-                        // ISBN duplicado
                         new AlertDialog.Builder(this)
                                 .setTitle("⚠️ ISBN Duplicado")
                                 .setMessage("Ya existe un libro con este ISBN en el catálogo:\n\n" +
@@ -334,7 +364,6 @@ public class SuggestionsManagementActivity extends AppCompatActivity {
                                 .setNegativeButton("Cancelar", null)
                                 .show();
                     } else {
-                        // ISBN único, aprobar directamente
                         confirmarAprobacion(sugerenciaId);
                     }
                 })
@@ -344,7 +373,6 @@ public class SuggestionsManagementActivity extends AppCompatActivity {
                 });
     }
 
-    // ✅ NUEVO: Confirmación antes de aprobar
     private void confirmarAprobacion(String id) {
         new AlertDialog.Builder(this)
                 .setTitle("Confirmar aprobación")
@@ -356,7 +384,6 @@ public class SuggestionsManagementActivity extends AppCompatActivity {
                 .show();
     }
 
-    // ✅ NUEVO: Confirmación antes de rechazar
     private void confirmarRechazo(String id) {
         new AlertDialog.Builder(this)
                 .setTitle("Confirmar rechazo")
@@ -368,7 +395,6 @@ public class SuggestionsManagementActivity extends AppCompatActivity {
                 .show();
     }
 
-    // ✅ NUEVO: Validar datos antes de agregar al catálogo
     private boolean validarDatosParaCatalogo(String titulo, String autor, String categoria) {
         if (titulo == null || titulo.trim().isEmpty()) {
             Toast.makeText(this, "⚠️ Error: Título no válido", Toast.LENGTH_LONG).show();
@@ -401,16 +427,37 @@ public class SuggestionsManagementActivity extends AppCompatActivity {
                         Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
-    private void agregarLibroDesdeSugerencia(String titulo, String autor, String categoria,
-                                             String edicion, String isbn, String year, String coverImageUrl) {
-        Intent intent = new Intent(this, BookManagementActivity.class);
-        intent.putExtra("titulo_sugerencia", titulo);
-        intent.putExtra("autor_sugerencia", autor);
-        intent.putExtra("categoria_sugerencia", categoria);
-        intent.putExtra("edicion_sugerencia", edicion);
-        intent.putExtra("isbn_sugerencia", isbn);
-        intent.putExtra("year_sugerencia", year);
-        intent.putExtra("cover_url_sugerencia", coverImageUrl);
-        startActivity(intent);
+    private void agregarLibroDesdeSugerencia(String sugerenciaId, String titulo, String autor,
+                                             String categoria, String edicion, String isbn,
+                                             String year, String coverImageBase64) {
+        // Marcar en Firestore que ya fue agregada al catálogo
+        Map<String, Object> update = new HashMap<>();
+        update.put("addedToCatalog", true);
+
+        sugerenciasRef.document(sugerenciaId).update(update)
+                .addOnSuccessListener(aVoid -> {
+                    // Navegar a BookManagementActivity con los datos
+                    Intent intent = new Intent(this, BookManagementActivity.class);
+                    intent.putExtra("titulo_sugerencia", titulo);
+                    intent.putExtra("autor_sugerencia", autor);
+                    intent.putExtra("categoria_sugerencia", categoria);
+                    intent.putExtra("edicion_sugerencia", edicion);
+                    intent.putExtra("isbn_sugerencia", isbn);
+                    intent.putExtra("year_sugerencia", year);
+                    intent.putExtra("cover_base64_sugerencia", coverImageBase64);
+                    startActivity(intent);
+
+                    Toast.makeText(this, "✅ Sugerencia marcada como agregada", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Error al marcar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Siempre recargar para actualizar el estado
+        cargarListaSugerencias();
     }
 }

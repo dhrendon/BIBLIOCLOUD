@@ -54,7 +54,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         // Cargar datos de bibliotecas desde JSON
         cargarDatosBibliotecas();
 
-        // Inicializar Places API
+        // 🔥 CORREGIDO: Leer API Key desde BuildConfig o Manifest
         initializePlaces();
         initializeViews();
         checkLocationPermission();
@@ -62,14 +62,37 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     private void initializePlaces() {
         if (!Places.isInitialized()) {
-            Places.initialize(getApplicationContext(), "AIzaSyBTzm4kVIIjfgJoxYrOZmKze8vhLtpZhR4");
+            try {
+                // 🔥 OPCIÓN 1: Leer desde AndroidManifest.xml
+                android.content.pm.ApplicationInfo appInfo = getPackageManager()
+                        .getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);
+
+                String apiKey = appInfo.metaData.getString("com.google.android.geo.API_KEY");
+
+                if (apiKey != null && !apiKey.isEmpty()) {
+                    Places.initialize(getApplicationContext(), apiKey);
+                    placesClient = Places.createClient(this);
+                    Log.d(TAG, "✅ Places API inicializada correctamente");
+                } else {
+                    Log.e(TAG, "❌ API Key no encontrada en AndroidManifest.xml");
+                    Toast.makeText(this,
+                            "Error: Configura tu Google Maps API Key",
+                            Toast.LENGTH_LONG).show();
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "❌ Error inicializando Places API: " + e.getMessage());
+                Toast.makeText(this,
+                        "Error al inicializar mapas. Verifica tu configuración.",
+                        Toast.LENGTH_LONG).show();
+            }
         }
-        placesClient = Places.createClient(this);
     }
 
     private void initializeViews() {
         MaterialButton btnVolver = findViewById(R.id.btnVolverMapa);
-        btnVolver.setOnClickListener(v -> finish());
+        if (btnVolver != null) {
+            btnVolver.setOnClickListener(v -> finish());
+        }
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -114,10 +137,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 ));
             }
 
-            Log.d(TAG, "Bibliotecas cargadas: " + bibliotecasInfo.size());
+            Log.d(TAG, "✅ Bibliotecas cargadas: " + bibliotecasInfo.size());
 
         } catch (IOException | JSONException e) {
-            Log.e(TAG, "Error cargando datos de bibliotecas: " + e.getMessage());
+            Log.e(TAG, "⚠️ Error cargando datos de bibliotecas: " + e.getMessage());
             // Datos de ejemplo si hay error
             cargarDatosEjemplo();
         }
@@ -139,7 +162,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 true, new String[]{"Don Quijote", "Rayuela", "La tregua"}
         ));
 
-        Log.d(TAG, "Datos de ejemplo cargados: " + bibliotecasInfo.size());
+        Log.d(TAG, "✅ Datos de ejemplo cargados: " + bibliotecasInfo.size());
     }
 
     private void checkLocationPermission() {
@@ -245,7 +268,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     @Override
     public boolean onMarkerClick(Marker marker) {
         // No procesar clic en el marcador del usuario
-        if (marker.getTitle().equals("📍 Tu ubicación actual")) {
+        if (marker.getTitle() != null && marker.getTitle().equals("📍 Tu ubicación actual")) {
             return false;
         }
 
@@ -271,7 +294,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         mensaje.append("🕒 ").append(biblioteca.getHorario()).append("\n\n");
 
         if (biblioteca.isDisponible()) {
-            mensaje.append("BIBLIOTECA ABIERTA\n\n");
+            mensaje.append("✅ BIBLIOTECA ABIERTA\n\n");
             mensaje.append("Libros disponibles:\n");
 
             if (biblioteca.getLibrosDisponibles().length > 0) {
@@ -283,7 +306,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             }
 
         } else {
-            mensaje.append("BIBLIOTECA CERRADA TEMPORALMENTE\n\n");
+            mensaje.append("❌ BIBLIOTECA CERRADA TEMPORALMENTE\n\n");
             mensaje.append("ℹ️ No disponible para visitas o préstamos\n");
         }
 

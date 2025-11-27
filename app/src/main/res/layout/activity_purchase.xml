@@ -82,6 +82,18 @@
                         android:textStyle="bold"
                         android:layout_marginBottom="8dp"/>
 
+                    <TextView
+                        android:id="@+id/tvStockAvailable"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="📦 Stock disponible: 5 unidades"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:padding="8dp"
+                        android:visibility="gone"
+                        android:background="@color/light_brown"
+                        android:layout_marginBottom="16dp"/>
+
                     <Spinner
                         android:id="@+id/spinnerQuantity"
                         android:layout_width="match_parent"

@@ -46,6 +46,7 @@
                     android:textColor="@color/colorPrimary"
                     android:layout_marginBottom="16dp"/>
 
+                <!-- Nombre de sucursal -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -59,19 +60,54 @@
                         android:inputType="text"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.textfield.TextInputLayout
+                <!-- ✅ SECCIÓN DE UBICACIÓN (REEMPLAZA CAMPO DE DIRECCIÓN) -->
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:text="📍 Ubicación"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="@color/colorPrimary"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSelectLocation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="📍 Seleccionar Ubicación en el Mapa"
                     android:layout_marginBottom="8dp"
-                    android:hint="Dirección">
+                    app:backgroundTint="@color/accent_brown"
+                    app:icon="@android:drawable/ic_menu_mylocation"
+                    app:iconGravity="textStart"/>
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etBranchAddress"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textPostalAddress"/>
-                </com.google.android.material.textfield.TextInputLayout>
+                <!-- Coordenadas seleccionadas -->
+                <TextView
+                    android:id="@+id/tvSelectedLocation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="📍 Ubicación no seleccionada"
+                    android:textColor="@color/colorTextSecondary"
+                    android:textSize="14sp"
+                    android:padding="12dp"
+                    android:background="@color/light_brown"
+                    android:layout_marginBottom="8dp"/>
 
+                <!-- Dirección obtenida automáticamente -->
+                <TextView
+                    android:id="@+id/tvSelectedAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="@color/green"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:padding="12dp"
+                    android:background="@color/light_brown"
+                    android:layout_marginBottom="16dp"
+                    android:visibility="gone"/>
+
+                <!-- Teléfono -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -85,6 +121,7 @@
                         android:inputType="phone"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!-- Horario -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -99,11 +136,12 @@
                         android:text="Lun-Vie: 9:00-20:00, Sáb: 10:00-14:00"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!-- Nombre del Gerente -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
-                    android:hint="Nombre del Gerente">
+                    android:hint="Nombre del Gerente (Opcional)">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etManagerName"
@@ -112,11 +150,12 @@
                         android:inputType="textPersonName"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!-- Email del Gerente -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    android:hint="Email del Gerente">
+                    android:hint="Email del Gerente (Opcional)">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etManagerEmail"
@@ -125,45 +164,39 @@
                         android:inputType="textEmailAddress"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Selección de ubicación -->
-                <TextView
-                    android:id="@+id/tvSelectedLocation"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Ubicación no seleccionada"
-                    android:textColor="@color/colorTextSecondary"
-                    android:padding="12dp"
-                    android:background="@color/light_brown"
-                    android:layout_marginBottom="8dp"/>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnSelectLocation"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="📍 Seleccionar Ubicación en el Mapa"
-                    android:layout_marginBottom="16dp"
-                    app:backgroundTint="@color/accent_brown"/>
-
+                <!-- Botón agregar -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnAddBranch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Agregar Sucursal"
-                    app:backgroundTint="@color/colorPrimary"/>
+                    android:text="✅ Agregar Sucursal"
+                    app:backgroundTint="@color/colorPrimary"
+                    app:icon="@android:drawable/ic_input_add"
+                    app:iconGravity="textStart"/>
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
         <!-- Lista de sucursales -->
-        <TextView
-            android:id="@+id/tvTotalBranches"
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Total de Sucursales: 0"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="@color/colorPrimary"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginBottom="16dp"
+            app:cardElevation="4dp"
+            app:cardCornerRadius="8dp"
+            app:cardBackgroundColor="@color/light_brown">
+
+            <TextView
+                android:id="@+id/tvTotalBranches"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Total de Sucursales: 0"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorPrimary"
+                android:padding="16dp"
+                android:gravity="center"/>
+        </androidx.cardview.widget.CardView>
 
         <LinearLayout
             android:id="@+id/layoutBranchesList"
@@ -178,7 +211,9 @@
             android:layout_height="wrap_content"
             android:text="Volver"
             android:layout_marginTop="16dp"
-            app:backgroundTint="@color/colorTextSecondary"/>
+            app:backgroundTint="@color/colorTextSecondary"
+            app:icon="@android:drawable/ic_menu_revert"
+            app:iconGravity="textStart"/>
 
     </LinearLayout>
 </ScrollView>

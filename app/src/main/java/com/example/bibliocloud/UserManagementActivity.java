@@ -3,6 +3,7 @@ package com.example.bibliocloud;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -15,11 +16,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -31,10 +29,15 @@ import java.util.Map;
 
 public class UserManagementActivity extends AppCompatActivity {
 
+    private static final String TAG = "UserManagementActivity";
+
     private FirebaseFirestore db;
     private LinearLayout layoutListaUsuarios;
 
-    // Form fields
+    private TextView tvTotalUsers;
+    private TextView tvTotalCashiers;
+    private TextView tvTotalAdmins;
+
     private com.google.android.material.textfield.TextInputEditText etName;
     private com.google.android.material.textfield.TextInputEditText etEmail;
     private com.google.android.material.textfield.TextInputEditText etPassword;
@@ -46,13 +49,17 @@ public class UserManagementActivity extends AppCompatActivity {
     private Spinner spinnerBranch;
     private android.widget.CheckBox checkboxTerms;
     private com.google.android.material.button.MaterialButton btnRegister;
+    private com.google.android.material.button.MaterialButton btnGoToLogin;
 
-    // Branches list
     private ArrayList<String> listaSucursales = new ArrayList<>();
+    private ArrayList<String> listaSucursalesIds = new ArrayList<>();
     private ArrayAdapter<String> branchAdapter;
 
-    // Role of logged user (to protect access)
     private String rolActualLogueado = "";
+
+    private int totalUsuarios = 0;
+    private int totalCajeros = 0;
+    private int totalAdministradores = 0;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,7 +68,10 @@ public class UserManagementActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
-        // UI refs
+        tvTotalUsers = findViewById(R.id.tvTotalUsers);
+        tvTotalCashiers = findViewById(R.id.tvTotalCashiers);
+        tvTotalAdmins = findViewById(R.id.tvTotalAdmins);
+
         layoutListaUsuarios = findViewById(R.id.layoutListaUsuarios);
 
         etName = findViewById(R.id.etName);
@@ -75,38 +85,39 @@ public class UserManagementActivity extends AppCompatActivity {
         spinnerBranch = findViewById(R.id.spinnerBranch);
         checkboxTerms = findViewById(R.id.checkboxTerms);
         btnRegister = findViewById(R.id.btnRegister);
+        btnGoToLogin = findViewById(R.id.btnGoToLogin);
 
-        // Inicialmente ocultar selector de sucursal
         layoutBranchSelector.setVisibility(View.GONE);
 
-        // Configurar spinner de roles (para admin solo "Cajero")
         ArrayAdapter<String> adapterRoles = new ArrayAdapter<>(
                 this, android.R.layout.simple_spinner_item,
-                new String[]{"cajero"}); // Forzamos que el admin solo pueda crear cajeros
+                new String[]{"cajero"});
         adapterRoles.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerUserType.setAdapter(adapterRoles);
 
-        // Listener para mostrar sucursales si es cajero
         spinnerUserType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String tipo = parent.getItemAtPosition(position).toString().toLowerCase();
                 if ("cajero".equals(tipo)) layoutBranchSelector.setVisibility(View.VISIBLE);
                 else layoutBranchSelector.setVisibility(View.GONE);
             }
-            @Override public void onNothingSelected(AdapterView<?> parent) { }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
         });
 
-        // Cargar sucursales (spinner)
         cargarSucursales();
-
-        // Verificar rol del usuario logueado — si no es administrador, cerrar
         verificarRolActual();
 
-        // Registrar cajero
         btnRegister.setOnClickListener(v -> registrarCajero());
 
-        // Cargar lista de usuarios
-        cargarUsuarios();
+        if (btnGoToLogin != null) {
+            btnGoToLogin.setOnClickListener(v -> finish());
+        }
+
+        // ✅ NO cargar usuarios aquí, onResume() lo hará
     }
 
     private void verificarRolActual() {
@@ -129,6 +140,7 @@ public class UserManagementActivity extends AppCompatActivity {
                             return;
                         }
                         rolActualLogueado = rol;
+                        Log.d(TAG, "✅ Usuario verificado como: " + rol);
                     } else {
                         Toast.makeText(this, "Perfil no encontrado. Acceso denegado.", Toast.LENGTH_LONG).show();
                         finish();
@@ -145,19 +157,35 @@ public class UserManagementActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(query -> {
                     listaSucursales.clear();
+                    listaSucursalesIds.clear();
+
                     for (DocumentSnapshot doc : query) {
-                        String nombre = doc.getString("name");
-                        if (nombre != null) listaSucursales.add(nombre);
+                        String nombre = doc.getString("nombre");
+                        if (nombre == null) nombre = doc.getString("name");
+
+                        if (nombre != null) {
+                            listaSucursales.add(nombre);
+                            listaSucursalesIds.add(doc.getId());
+                        }
                     }
-                    if (listaSucursales.isEmpty()) listaSucursales.add("Sin sucursales");
+
+                    if (listaSucursales.isEmpty()) {
+                        listaSucursales.add("Sin sucursales");
+                        listaSucursalesIds.add("");
+                    }
 
                     branchAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, listaSucursales);
                     branchAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     spinnerBranch.setAdapter(branchAdapter);
+
+                    Log.d(TAG, "✅ Sucursales cargadas: " + listaSucursales.size());
                 })
                 .addOnFailureListener(e -> {
+                    Log.e(TAG, "❌ Error al cargar sucursales: " + e.getMessage());
                     listaSucursales.clear();
                     listaSucursales.add("Sin sucursales");
+                    listaSucursalesIds.clear();
+                    listaSucursalesIds.add("");
                     branchAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, listaSucursales);
                     spinnerBranch.setAdapter(branchAdapter);
                 });
@@ -171,9 +199,13 @@ public class UserManagementActivity extends AppCompatActivity {
         String telefono = etPhone.getText() != null ? etPhone.getText().toString().trim() : "";
         String direccion = etDireccion.getText() != null ? etDireccion.getText().toString().trim() : "";
         String rol = spinnerUserType.getSelectedItem() != null ? spinnerUserType.getSelectedItem().toString().toLowerCase() : "cajero";
-        String sucursal = spinnerBranch.getSelectedItem() != null ? spinnerBranch.getSelectedItem().toString() : "";
 
-        // Validaciones
+        int sucursalPos = spinnerBranch.getSelectedItemPosition();
+        String sucursalNombre = sucursalPos >= 0 && sucursalPos < listaSucursales.size() ?
+                listaSucursales.get(sucursalPos) : "";
+        String sucursalId = sucursalPos >= 0 && sucursalPos < listaSucursalesIds.size() ?
+                listaSucursalesIds.get(sucursalPos) : "";
+
         if (TextUtils.isEmpty(nombre) || TextUtils.isEmpty(correo) || TextUtils.isEmpty(pass) || TextUtils.isEmpty(confirm)) {
             Toast.makeText(this, "Completa todos los campos obligatorios", Toast.LENGTH_SHORT).show();
             return;
@@ -190,11 +222,14 @@ public class UserManagementActivity extends AppCompatActivity {
             Toast.makeText(this, "Solo se pueden crear cajeros desde aquí", Toast.LENGTH_SHORT).show();
             return;
         }
+        if (sucursalId.isEmpty()) {
+            Toast.makeText(this, "⚠️ Selecciona una sucursal válida", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         btnRegister.setEnabled(false);
         btnRegister.setText("Registrando...");
 
-        // Crear usuario usando una instancia secundaria de FirebaseAuth para NO desconectar al admin
         try {
             FirebaseApp defaultApp = FirebaseApp.getInstance();
             FirebaseOptions options = defaultApp.getOptions();
@@ -210,7 +245,6 @@ public class UserManagementActivity extends AppCompatActivity {
                             btnRegister.setEnabled(true);
                             btnRegister.setText("Registrar Usuario");
                             Toast.makeText(this, "Error: no se creó el usuario", Toast.LENGTH_SHORT).show();
-                            // cleanup
                             secondaryAuth.signOut();
                             secondaryApp.delete();
                             return;
@@ -223,24 +257,27 @@ public class UserManagementActivity extends AppCompatActivity {
                         datos.put("telefono", telefono);
                         datos.put("direccion", direccion);
                         datos.put("rol", "cajero");
-                        datos.put("nombre_sucursal", sucursal);
+                        datos.put("nombre_sucursal", sucursalNombre);
+                        datos.put("sucursal_id", sucursalId);
+
+                        Log.d(TAG, "📝 Guardando cajero:");
+                        Log.d(TAG, "   - Nombre: " + nombre);
+                        Log.d(TAG, "   - Sucursal: " + sucursalNombre);
+                        Log.d(TAG, "   - Sucursal ID: " + sucursalId);
 
                         db.collection("usuarios").document(newUid)
                                 .set(datos)
                                 .addOnSuccessListener(aVoid -> {
-                                    Toast.makeText(this, "Cajero registrado correctamente", Toast.LENGTH_LONG).show();
-                                    // cleanup secondary
+                                    Toast.makeText(this, "✅ Cajero registrado correctamente", Toast.LENGTH_LONG).show();
                                     secondaryAuth.signOut();
                                     secondaryApp.delete();
-                                    // refrescar lista
                                     cargarUsuarios();
                                     btnRegister.setEnabled(true);
                                     btnRegister.setText("Registrar Usuario");
-                                    // limpiar campos
                                     limpiarCamposFormulario();
                                 })
                                 .addOnFailureListener(e -> {
-                                    Toast.makeText(this, "Error al guardar en Firestore: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                    Toast.makeText(this, "Error al guardar: " + e.getMessage(), Toast.LENGTH_LONG).show();
                                     secondaryAuth.signOut();
                                     secondaryApp.delete();
                                     btnRegister.setEnabled(true);
@@ -248,8 +285,11 @@ public class UserManagementActivity extends AppCompatActivity {
                                 });
                     })
                     .addOnFailureListener(e -> {
-                        Toast.makeText(this, "Error al crear usuario Auth: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                        try { secondaryApp.delete(); } catch (Exception ignored) {}
+                        Toast.makeText(this, "Error al crear usuario: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        try {
+                            secondaryApp.delete();
+                        } catch (Exception ignored) {
+                        }
                         btnRegister.setEnabled(true);
                         btnRegister.setText("Registrar Usuario");
                     });
@@ -259,7 +299,6 @@ public class UserManagementActivity extends AppCompatActivity {
             btnRegister.setText("Registrar Usuario");
             Toast.makeText(this, "Error interno: " + ex.getMessage(), Toast.LENGTH_LONG).show();
         }
-
     }
 
     private void limpiarCamposFormulario() {
@@ -274,33 +313,71 @@ public class UserManagementActivity extends AppCompatActivity {
     }
 
     private void cargarUsuarios() {
-        // Evitar views duplicadas
+        Log.d(TAG, "🔄 Cargando usuarios...");
+
+        // ✅ Limpiar UI y contadores ANTES de la consulta
         layoutListaUsuarios.removeAllViews();
+        totalUsuarios = 0;
+        totalCajeros = 0;
+        totalAdministradores = 0;
 
         db.collection("usuarios")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    layoutListaUsuarios.removeAllViews();
+                    Log.d(TAG, "✅ Usuarios obtenidos: " + queryDocumentSnapshots.size());
+
                     for (DocumentSnapshot doc : queryDocumentSnapshots) {
                         Map<String, Object> usuario = doc.getData();
                         if (usuario != null) {
+                            String rol = (String) usuario.get("rol");
+                            if (rol == null) rol = "usuario";
+
+                            totalUsuarios++;
+
+                            if ("cajero".equalsIgnoreCase(rol)) {
+                                totalCajeros++;
+                            } else if ("administrador".equalsIgnoreCase(rol)) {
+                                totalAdministradores++;
+                            }
+
                             CardView card = crearCardUsuario(doc.getId(), usuario);
-                            // asegurar que la card no bloquee eventos
-                            card.setClickable(true);
-                            card.setFocusable(true);
                             layoutListaUsuarios.addView(card);
                         }
                     }
+
+                    actualizarEstadisticas();
                 })
-                .addOnFailureListener(e ->
-                        Toast.makeText(this, "Error al cargar usuarios", Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "❌ Error cargando usuarios: " + e.getMessage());
+                    Toast.makeText(this, "Error al cargar usuarios", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void actualizarEstadisticas() {
+        if (tvTotalUsers == null || tvTotalCashiers == null || tvTotalAdmins == null) {
+            Log.e(TAG, "❌ TextViews de estadísticas son NULL");
+            return;
+        }
+
+        Log.d(TAG, "📊 Actualizando estadísticas:");
+        Log.d(TAG, "   - Total usuarios: " + totalUsuarios);
+        Log.d(TAG, "   - Total cajeros: " + totalCajeros);
+        Log.d(TAG, "   - Total administradores: " + totalAdministradores);
+
+        tvTotalUsers.setText("👥 Usuarios: " + totalUsuarios);
+        tvTotalCashiers.setText("👔 Cajeros: " + totalCajeros);
+        tvTotalAdmins.setText("🔑 Administradores: " + totalAdministradores);
+
+        tvTotalUsers.setTextColor(getResources().getColor(R.color.colorTextPrimary));
+        tvTotalCashiers.setTextColor(getResources().getColor(R.color.colorPrimary));
+        tvTotalAdmins.setTextColor(getResources().getColor(R.color.dark_brown));
     }
 
     private CardView crearCardUsuario(String userId, Map<String, Object> user) {
-
         CardView card = new CardView(this);
         card.setRadius(16);
         card.setCardElevation(8);
+        card.setCardBackgroundColor(getResources().getColor(R.color.light_brown));
 
         LinearLayout.LayoutParams cparams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -314,34 +391,43 @@ public class UserManagementActivity extends AppCompatActivity {
         int padding = (int) (16 * getResources().getDisplayMetrics().density);
         layout.setPadding(padding, padding, padding, padding);
 
-        // Nombre
         TextView tvNombre = new TextView(this);
         String nombre = (String) user.get("nombre");
         if (nombre == null) nombre = "Sin nombre";
         tvNombre.setText("👤 " + nombre);
+        tvNombre.setTextSize(16);
+        tvNombre.setTextColor(getResources().getColor(R.color.colorTextPrimary));
+        tvNombre.setTypeface(null, android.graphics.Typeface.BOLD);
         layout.addView(tvNombre);
 
-        // Correo
         TextView tvCorreo = new TextView(this);
         String correo = (String) user.get("correo");
         if (correo == null) correo = "Sin correo";
         tvCorreo.setText("📧 " + correo);
+        tvCorreo.setTextSize(14);
+        tvCorreo.setTextColor(getResources().getColor(R.color.colorTextSecondary));
         layout.addView(tvCorreo);
 
-        // Rol
         String rol = (String) user.get("rol");
         if (rol == null) rol = "usuario";
         TextView tvRol = new TextView(this);
         String rolTexto = rol.equals("administrador") ? "Administrador" :
                 rol.equals("cajero") ? "Cajero" : "Usuario";
         tvRol.setText("🔑 Rol: " + rolTexto);
+        tvRol.setTextSize(14);
+        tvRol.setTextColor(getResources().getColor(R.color.colorPrimary));
+        tvRol.setTypeface(null, android.graphics.Typeface.BOLD);
         layout.addView(tvRol);
 
-        // Sucursal
-        if ("cajero".equals(rol) && user.containsKey("nombre_sucursal")) {
-            TextView tvSucursal = new TextView(this);
-            tvSucursal.setText("🏢 Sucursal: " + user.get("nombre_sucursal"));
-            layout.addView(tvSucursal);
+        if ("cajero".equals(rol)) {
+            String sucursal = (String) user.get("nombre_sucursal");
+            if (sucursal != null && !sucursal.isEmpty()) {
+                TextView tvSucursal = new TextView(this);
+                tvSucursal.setText("🏢 Sucursal: " + sucursal);
+                tvSucursal.setTextSize(14);
+                tvSucursal.setTextColor(getResources().getColor(R.color.colorTextSecondary));
+                layout.addView(tvSucursal);
+            }
         }
 
         card.addView(layout);
@@ -359,6 +445,7 @@ public class UserManagementActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d(TAG, "📱 onResume() - Cargando usuarios");
         cargarUsuarios();
     }
 }

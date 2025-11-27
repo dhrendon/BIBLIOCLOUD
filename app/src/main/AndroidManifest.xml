@@ -115,6 +115,10 @@
             android:parentActivityName=".CashierDashboardActivity"/>
         <activity android:name=".UserPaymentHistoryActivity"
             android:parentActivityName=".MainActivity"/>
+        <activity
+            android:name=".TicketsViewerActivity"
+            android:label="Mis Tickets"
+            android:parentActivityName=".MyPurchasesActivity"/>
 
         <!-- Agregar dentro de <application> -->
         <activity

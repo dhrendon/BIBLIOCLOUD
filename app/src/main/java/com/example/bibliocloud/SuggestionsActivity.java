@@ -5,9 +5,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -34,25 +37,23 @@ import com.example.bibliocloud.models.Suggestion;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.UUID;
-
 import java.util.HashMap;
 import java.util.Map;
-import android.util.Log;
 
 public class SuggestionsActivity extends AppCompatActivity {
 
+    private static final String TAG = "SuggestionsActivity";
     private static final int PERMISSION_REQUEST_CODE = 100;
-    private static final int MAX_IMAGE_SIZE_MB = 5;
-    private static final int MAX_IMAGE_SIZE_BYTES = MAX_IMAGE_SIZE_MB * 1024 * 1024;
+
+    // 🔄 NUEVO: Tamaño máximo más pequeño para Base64 (aprox 200KB comprimido)
+    private static final int MAX_IMAGE_DIMENSION = 800; // Ancho/Alto máximo
+    private static final int COMPRESSION_QUALITY = 70;  // Calidad de compresión
 
     private EditText etTitle, etAuthor, etComments;
     private EditText etEdition, etIsbn, etYear;
@@ -69,8 +70,6 @@ public class SuggestionsActivity extends AppCompatActivity {
     private String currentUserEmail;
 
     private FirebaseFirestore db;
-    private FirebaseStorage storage;
-    private StorageReference storageRef;
 
     private Uri selectedImageUri;
     private Bitmap capturedImageBitmap;
@@ -83,6 +82,10 @@ public class SuggestionsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_suggestions);
 
+        // 🔥 INICIALIZAR FIREBASE FIRESTORE
+        db = FirebaseFirestore.getInstance();
+        Log.d(TAG, "✅ Firebase Firestore inicializado");
+
         initializeViews();
         setupToolbar();
         setupUserInfo();
@@ -90,11 +93,6 @@ public class SuggestionsActivity extends AppCompatActivity {
         setupRecyclerView();
         setupListeners();
         setupImageLaunchers();
-
-        db = FirebaseFirestore.getInstance();
-        storage = FirebaseStorage.getInstance();
-        storageRef = storage.getReference();
-
         listenUserSuggestions();
     }
 
@@ -158,18 +156,14 @@ public class SuggestionsActivity extends AppCompatActivity {
                         Bundle extras = result.getData().getExtras();
                         capturedImageBitmap = (Bitmap) extras.get("data");
 
-                        // ✅ VALIDAR TAMAÑO DE IMAGEN
-                        if (!validateImageSize(capturedImageBitmap)) {
-                            Toast.makeText(this,
-                                    "⚠️ Imagen muy grande. Máximo " + MAX_IMAGE_SIZE_MB + "MB",
-                                    Toast.LENGTH_LONG).show();
-                            capturedImageBitmap = null;
-                            return;
-                        }
+                        // 🔄 Redimensionar imagen
+                        capturedImageBitmap = resizeBitmap(capturedImageBitmap);
 
                         ivCoverPreview.setImageBitmap(capturedImageBitmap);
                         ivCoverPreview.setVisibility(View.VISIBLE);
                         selectedImageUri = null;
+
+                        Log.d(TAG, "✅ Imagen capturada y redimensionada desde cámara");
                     }
                 });
 
@@ -183,35 +177,65 @@ public class SuggestionsActivity extends AppCompatActivity {
                             Bitmap bitmap = MediaStore.Images.Media.getBitmap(
                                     getContentResolver(), selectedImageUri);
 
-                            // ✅ VALIDAR TAMAÑO DE IMAGEN
-                            if (!validateImageSize(bitmap)) {
-                                Toast.makeText(this,
-                                        "⚠️ Imagen muy grande. Máximo " + MAX_IMAGE_SIZE_MB + "MB",
-                                        Toast.LENGTH_LONG).show();
-                                selectedImageUri = null;
-                                return;
-                            }
+                            // 🔄 Redimensionar imagen
+                            bitmap = resizeBitmap(bitmap);
 
-                            ivCoverPreview.setImageURI(selectedImageUri);
+                            ivCoverPreview.setImageBitmap(bitmap);
                             ivCoverPreview.setVisibility(View.VISIBLE);
-                            capturedImageBitmap = null;
+                            capturedImageBitmap = bitmap;
+                            selectedImageUri = null;
+
+                            Log.d(TAG, "✅ Imagen seleccionada y redimensionada desde galería");
 
                         } catch (IOException e) {
+                            Log.e(TAG, "❌ Error cargando imagen: " + e.getMessage());
                             Toast.makeText(this, "Error al cargar imagen", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
     }
 
-    // ✅ NUEVO: Validar tamaño de imagen
-    private boolean validateImageSize(Bitmap bitmap) {
-        if (bitmap == null) return false;
+    // 🔄 NUEVO: Método para redimensionar bitmap
+    private Bitmap resizeBitmap(Bitmap original) {
+        if (original == null) return null;
+
+        int width = original.getWidth();
+        int height = original.getHeight();
+
+        // Si la imagen ya es pequeña, devolverla sin cambios
+        if (width <= MAX_IMAGE_DIMENSION && height <= MAX_IMAGE_DIMENSION) {
+            return original;
+        }
+
+        float scale;
+        if (width > height) {
+            scale = (float) MAX_IMAGE_DIMENSION / width;
+        } else {
+            scale = (float) MAX_IMAGE_DIMENSION / height;
+        }
+
+        int newWidth = Math.round(width * scale);
+        int newHeight = Math.round(height * scale);
+
+        Bitmap resized = Bitmap.createScaledBitmap(original, newWidth, newHeight, true);
+        Log.d(TAG, "📐 Imagen redimensionada: " + width + "x" + height + " → " + newWidth + "x" + newHeight);
+
+        return resized;
+    }
+
+    // 🔄 NUEVO: Convertir Bitmap a Base64
+    private String bitmapToBase64(Bitmap bitmap) {
+        if (bitmap == null) return null;
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
-        int sizeInBytes = baos.toByteArray().length;
+        bitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESSION_QUALITY, baos);
+        byte[] byteArray = baos.toByteArray();
 
-        return sizeInBytes <= MAX_IMAGE_SIZE_BYTES;
+        String base64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
+
+        Log.d(TAG, "📊 Tamaño Base64: " + (base64.length() / 1024) + " KB");
+
+        return base64;
     }
 
     private void showImageSourceDialog() {
@@ -265,7 +289,6 @@ public class SuggestionsActivity extends AppCompatActivity {
         }
     }
 
-    // ✅ VALIDACIONES MEJORADAS
     private void submitSuggestion() {
         String title = etTitle.getText().toString().trim();
         String author = etAuthor.getText().toString().trim();
@@ -275,7 +298,7 @@ public class SuggestionsActivity extends AppCompatActivity {
         String isbn = etIsbn.getText().toString().trim();
         String year = etYear.getText().toString().trim();
 
-        // ✅ 1. Validar título
+        // Validaciones
         if (title.isEmpty()) {
             etTitle.setError("Ingresa el título del libro");
             etTitle.requestFocus();
@@ -288,7 +311,6 @@ public class SuggestionsActivity extends AppCompatActivity {
             return;
         }
 
-        // ✅ 2. Validar autor
         if (author.isEmpty()) {
             etAuthor.setError("Ingresa el autor del libro");
             etAuthor.requestFocus();
@@ -301,23 +323,18 @@ public class SuggestionsActivity extends AppCompatActivity {
             return;
         }
 
-        // ✅ 3. Validar categoría
         if (category.equals("Selecciona una categoría") || category.isEmpty()) {
             Toast.makeText(this, "⚠️ Selecciona una categoría válida", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // ✅ 4. Validar ISBN (opcional pero si se ingresa, validar formato)
         if (!isbn.isEmpty()) {
-            // Eliminar guiones y espacios
             isbn = isbn.replaceAll("[\\s-]", "");
-
             if (isbn.length() != 10 && isbn.length() != 13) {
                 etIsbn.setError("ISBN debe tener 10 o 13 dígitos");
                 etIsbn.requestFocus();
                 return;
             }
-
             if (!isbn.matches("\\d+")) {
                 etIsbn.setError("ISBN debe contener solo números");
                 etIsbn.requestFocus();
@@ -325,12 +342,10 @@ public class SuggestionsActivity extends AppCompatActivity {
             }
         }
 
-        // ✅ 5. Validar año (opcional pero si se ingresa, validar rango)
         if (!year.isEmpty()) {
             try {
                 int yearInt = Integer.parseInt(year);
                 int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-
                 if (yearInt < 1000 || yearInt > currentYear) {
                     etYear.setError("Año inválido (1000-" + currentYear + ")");
                     etYear.requestFocus();
@@ -343,7 +358,6 @@ public class SuggestionsActivity extends AppCompatActivity {
             }
         }
 
-        // Deshabilitar botón mientras se procesa
         btnSubmitSuggestion.setEnabled(false);
         btnSubmitSuggestion.setText("Enviando...");
 
@@ -353,56 +367,19 @@ public class SuggestionsActivity extends AppCompatActivity {
         suggestion.setIsbn(isbn);
         suggestion.setYear(year);
 
-        // Si hay imagen, subirla primero
-        if (selectedImageUri != null || capturedImageBitmap != null) {
-            uploadImageAndSubmit(suggestion);
-        } else {
-            submitSuggestionToFirestore(suggestion);
-        }
-    }
-
-    private void uploadImageAndSubmit(Suggestion suggestion) {
-        String fileName = "suggestions/" + UUID.randomUUID().toString() + ".jpg";
-        StorageReference imageRef = storageRef.child(fileName);
-
-        byte[] data;
-
+        // 🔄 Convertir imagen a Base64 si existe
         if (capturedImageBitmap != null) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            capturedImageBitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
-            data = baos.toByteArray();
-        } else if (selectedImageUri != null) {
-            try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImageUri);
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
-                data = baos.toByteArray();
-            } catch (IOException e) {
-                Toast.makeText(this, "Error al procesar imagen", Toast.LENGTH_SHORT).show();
-                btnSubmitSuggestion.setEnabled(true);
-                btnSubmitSuggestion.setText("Enviar Sugerencia");
-                return;
-            }
-        } else {
-            submitSuggestionToFirestore(suggestion);
-            return;
+            Log.d(TAG, "📸 Convirtiendo imagen a Base64...");
+            String base64Image = bitmapToBase64(capturedImageBitmap);
+            suggestion.setCoverImageBase64(base64Image);
         }
 
-        imageRef.putBytes(data)
-                .addOnSuccessListener(taskSnapshot ->
-                        imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                            suggestion.setCoverImageUrl(uri.toString());
-                            submitSuggestionToFirestore(suggestion);
-                        }))
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Error al subir imagen: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    btnSubmitSuggestion.setEnabled(true);
-                    btnSubmitSuggestion.setText("Enviar Sugerencia");
-                });
+        submitSuggestionToFirestore(suggestion);
     }
 
     private void submitSuggestionToFirestore(Suggestion suggestion) {
-        // 🔥 SOLUCIÓN: Convertir el objeto Suggestion a Map antes de guardar
+        Log.d(TAG, "💾 Guardando sugerencia en Firestore...");
+
         Map<String, Object> suggestionData = new HashMap<>();
         suggestionData.put("title", suggestion.getTitle());
         suggestionData.put("author", suggestion.getAuthor());
@@ -411,7 +388,7 @@ public class SuggestionsActivity extends AppCompatActivity {
         suggestionData.put("edition", suggestion.getEdition());
         suggestionData.put("isbn", suggestion.getIsbn());
         suggestionData.put("year", suggestion.getYear());
-        suggestionData.put("coverImageUrl", suggestion.getCoverImageUrl());
+        suggestionData.put("coverImageBase64", suggestion.getCoverImageBase64()); // 🔄 Base64
         suggestionData.put("userEmail", currentUserEmail);
         suggestionData.put("status", "Pendiente");
         suggestionData.put("suggestionDate", com.google.firebase.firestore.FieldValue.serverTimestamp());
@@ -419,14 +396,16 @@ public class SuggestionsActivity extends AppCompatActivity {
         db.collection("sugerencias")
                 .add(suggestionData)
                 .addOnSuccessListener(documentReference -> {
+                    Log.d(TAG, "✅ Sugerencia guardada con ID: " + documentReference.getId());
                     Toast.makeText(this, "✅ ¡Sugerencia enviada exitosamente!", Toast.LENGTH_LONG).show();
                     limpiarFormulario();
                     btnSubmitSuggestion.setEnabled(true);
                     btnSubmitSuggestion.setText("Enviar Sugerencia");
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "❌ Error al enviar sugerencia: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                    Log.e("SuggestionsActivity", "Error guardando sugerencia", e);
+                    Log.e(TAG, "❌ Error guardando sugerencia: " + e.getMessage());
+                    Toast.makeText(this, "❌ Error al enviar sugerencia: " + e.getMessage(),
+                            Toast.LENGTH_LONG).show();
                     btnSubmitSuggestion.setEnabled(true);
                     btnSubmitSuggestion.setText("Enviar Sugerencia");
                 });

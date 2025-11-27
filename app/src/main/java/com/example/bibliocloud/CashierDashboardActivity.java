@@ -26,6 +26,7 @@ public class CashierDashboardActivity extends AppCompatActivity {
     private String cashierName;
     private String branchId;
     private String branchName;
+    private String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,9 +37,6 @@ public class CashierDashboardActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         initializeViews();
-        loadCashierInfo();
-        loadPendingOrdersCount();
-        loadTodayPayments();
         setupListeners();
     }
 
@@ -55,14 +53,125 @@ public class CashierDashboardActivity extends AppCompatActivity {
     }
 
     private void loadCashierInfo() {
-        SharedPreferences prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
-        cashierName = prefs.getString("current_user_name", "Cajero");
-        branchId = prefs.getString("branch_id", "");
-        branchName = prefs.getString("branch_name", "Sucursal");
+        if (mAuth.getCurrentUser() == null) {
+            Log.e(TAG, "❌ No hay usuario autenticado");
+            tvWelcome.setText("Error: No autenticado");
+            tvBranchName.setText("📍 Sin sesión");
+            return;
+        }
 
-        tvWelcome.setText("Bienvenido, " + cashierName);
-        tvBranchName.setText("📍 Sucursal: " + branchName);
+        userId = mAuth.getCurrentUser().getUid();
+        Log.d(TAG, "🔑 User ID: " + userId);
 
+        // Siempre cargar desde Firestore para tener datos actualizados
+        loadCashierFromFirestore();
+    }
+
+    private void loadCashierFromFirestore() {
+        db.collection("usuarios")
+                .document(userId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (!documentSnapshot.exists()) {
+                        Log.e(TAG, "❌ No se encontró el documento del usuario");
+                        tvWelcome.setText("Error: Usuario no encontrado");
+                        tvBranchName.setText("📍 Sin datos");
+                        return;
+                    }
+
+                    cashierName = documentSnapshot.getString("nombre");
+                    branchId = documentSnapshot.getString("sucursal_id");
+                    String branchNameFromUser = documentSnapshot.getString("nombre_sucursal");
+
+                    Log.d(TAG, "✅ Datos del cajero cargados");
+                    Log.d(TAG, "👤 Nombre: " + cashierName);
+                    Log.d(TAG, "🏢 Sucursal ID: " + branchId);
+                    Log.d(TAG, "🏢 Nombre sucursal (del usuario): " + branchNameFromUser);
+                    Log.d(TAG, "📄 Documento completo: " + documentSnapshot.getData());
+
+                    // Si tiene sucursal_id, cargar el nombre real desde sucursales
+                    if (branchId != null && !branchId.isEmpty()) {
+                        loadBranchName(branchId);
+                    } else {
+                        // Si no tiene sucursal_id pero sí nombre_sucursal, usar ese
+                        if (branchNameFromUser != null && !branchNameFromUser.isEmpty()) {
+                            Log.w(TAG, "⚠️ Usando nombre_sucursal del usuario (no hay sucursal_id)");
+                            branchName = branchNameFromUser;
+                            displayCashierInfo();
+                            loadPendingOrdersCount();
+                            loadTodayPayments();
+                        } else {
+                            Log.e(TAG, "❌ El cajero no tiene sucursal asignada");
+                            tvBranchName.setText("📍 Sin sucursal asignada");
+                            tvWelcome.setText("Bienvenido, " + (cashierName != null ? cashierName : "Cajero"));
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "❌ Error al cargar cajero: " + e.getMessage(), e);
+                    tvWelcome.setText("Error al cargar datos");
+                    tvBranchName.setText("📍 Error de conexión");
+                });
+    }
+
+    private void loadBranchName(String sucursalId) {
+        Log.d(TAG, "🔍 Buscando sucursal con ID: " + sucursalId);
+
+        db.collection("sucursales")
+                .document(sucursalId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (!documentSnapshot.exists()) {
+                        Log.e(TAG, "❌ No existe documento para sucursal ID: " + sucursalId);
+                        tvBranchName.setText("📍 Sucursal no encontrada");
+                        tvWelcome.setText("Bienvenido, " + (cashierName != null ? cashierName : "Cajero"));
+                        return;
+                    }
+
+                    Log.d(TAG, "📄 Documento de sucursal encontrado: " + documentSnapshot.getData());
+
+                    // Buscar el campo 'name' (según el modelo Branch)
+                    branchName = documentSnapshot.getString("name");
+
+                    // Fallback: intentar también 'nombre' por si hay inconsistencias
+                    if (branchName == null || branchName.isEmpty()) {
+                        branchName = documentSnapshot.getString("nombre");
+                        Log.w(TAG, "⚠️ Campo 'name' no encontrado, usando 'nombre': " + branchName);
+                    }
+
+                    if (branchName != null && !branchName.isEmpty()) {
+                        Log.d(TAG, "✅ Sucursal encontrada: " + branchName);
+
+                        // Guardar en SharedPreferences
+                        SharedPreferences prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putString("current_user_name", cashierName);
+                        editor.putString("branch_id", branchId);
+                        editor.putString("branch_name", branchName);
+                        editor.apply();
+
+                        // Mostrar información
+                        displayCashierInfo();
+                        loadPendingOrdersCount();
+                        loadTodayPayments();
+                    } else {
+                        Log.e(TAG, "❌ El documento de sucursal no tiene campo 'name' o 'nombre'");
+                        tvBranchName.setText("📍 Sucursal sin nombre");
+                        tvWelcome.setText("Bienvenido, " + (cashierName != null ? cashierName : "Cajero"));
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "❌ Error al cargar sucursal: " + e.getMessage(), e);
+                    tvBranchName.setText("📍 Error al cargar sucursal");
+                    tvWelcome.setText("Bienvenido, " + (cashierName != null ? cashierName : "Cajero"));
+                });
+    }
+
+    private void displayCashierInfo() {
+        tvWelcome.setText("Bienvenido, " + (cashierName != null ? cashierName : "Cajero"));
+        tvBranchName.setText("📍 Sucursal: " + (branchName != null ? branchName : "Sin asignar"));
+
+        Log.d(TAG, "✅ Información mostrada:");
         Log.d(TAG, "👤 Cajero: " + cashierName);
         Log.d(TAG, "🏢 Sucursal: " + branchName + " (ID: " + branchId + ")");
     }
@@ -71,8 +180,14 @@ public class CashierDashboardActivity extends AppCompatActivity {
         db.collection("compras")
                 .whereEqualTo("status", "Pendiente")
                 .addSnapshotListener((value, error) -> {
-                    if (error != null || value == null) {
-                        Log.e(TAG, "Error cargando órdenes: " + (error != null ? error.getMessage() : "null"));
+                    if (error != null) {
+                        Log.e(TAG, "❌ Error cargando órdenes: " + error.getMessage());
+                        tvPendingOrders.setText("Órdenes pendientes: 0");
+                        return;
+                    }
+
+                    if (value == null) {
+                        Log.w(TAG, "⚠️ Valor nulo al cargar órdenes");
                         tvPendingOrders.setText("Órdenes pendientes: 0");
                         return;
                     }
@@ -84,21 +199,26 @@ public class CashierDashboardActivity extends AppCompatActivity {
     }
 
     private void loadTodayPayments() {
-        // Obtener fecha actual en formato dd/MM/yyyy
+        if (branchName == null || branchName.isEmpty()) {
+            Log.w(TAG, "⚠️ No hay nombre de sucursal, no se pueden cargar pagos");
+            tvTodayPayments.setText("Pagos hoy: 0 | $0.00");
+            return;
+        }
+
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         String today = dateFormat.format(new Date());
 
-        Log.d(TAG, "🔍 Consultando pagos para fecha: " + today);
-        Log.d(TAG, "🏢 Sucursal: " + branchName);
+        Log.d(TAG, "🔍 Consultando pagos:");
+        Log.d(TAG, "   - Fecha: " + today);
+        Log.d(TAG, "   - Sucursal: " + branchName);
 
         db.collection("pagos")
                 .whereEqualTo("estado", "Completado")
                 .whereEqualTo("formattedDate", today)
                 .whereEqualTo("nombre_sucursal", branchName)
                 .addSnapshotListener((value, error) -> {
-
                     if (error != null) {
-                        Log.e(TAG, "❌ Error en consulta: " + error.getMessage());
+                        Log.e(TAG, "❌ Error en consulta de pagos: " + error.getMessage());
                         tvTodayPayments.setText("Pagos hoy: 0 | $0.00");
                         return;
                     }
@@ -115,25 +235,18 @@ public class CashierDashboardActivity extends AppCompatActivity {
                     Log.d(TAG, "✅ Pagos encontrados: " + count);
 
                     for (DocumentSnapshot doc : value.getDocuments()) {
-                        // Intentar obtener el monto
                         Double amount = doc.getDouble("monto");
-                        if (amount == null) {
-                            amount = doc.getDouble("subtotal");
-                        }
+                        if (amount == null) amount = doc.getDouble("subtotal");
 
                         if (amount != null) {
                             total += amount;
-                            Log.d(TAG, "💰 Pago ID: " + doc.getId() + " - $" + amount);
-                        } else {
-                            Log.w(TAG, "⚠️ Pago sin monto: " + doc.getId());
+                            Log.d(TAG, "💰 Pago: $" + amount);
                         }
                     }
 
-                    String displayText = String.format(Locale.getDefault(),
-                            "Pagos hoy: %d | $%.2f", count, total);
-                    tvTodayPayments.setText(displayText);
-
-                    Log.d(TAG, "📊 Total calculado: $" + total);
+                    tvTodayPayments.setText(String.format(Locale.getDefault(),
+                            "Pagos hoy: %d | $%.2f", count, total));
+                    Log.d(TAG, "📊 Total: $" + total);
                 });
     }
 
@@ -179,7 +292,7 @@ public class CashierDashboardActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        loadPendingOrdersCount();
-        loadTodayPayments();
+        Log.d(TAG, "📱 onResume() - Cargando información del cajero");
+        loadCashierInfo();
     }
 }

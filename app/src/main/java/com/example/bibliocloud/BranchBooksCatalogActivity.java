@@ -240,6 +240,7 @@ public class BranchBooksCatalogActivity extends AppCompatActivity {
         intent.putExtra("price", item.getInventory().getSalePrice());
         intent.putExtra("branchId", item.getInventory().getBranchId());
         intent.putExtra("branchName", item.getInventory().getBranchName());
+        intent.putExtra("availableStock", item.getInventory().getAvailablePhysical()); // 🔥 AGREGAR ESTO
         startActivity(intent);
     }
 

@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.*;
 import androidx.annotation.NonNull;
@@ -17,17 +18,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.firestore.*;
 import com.google.firebase.FirebaseApp;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
-
-import android.content.DialogInterface;
 import androidx.appcompat.app.AlertDialog;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
@@ -35,11 +32,11 @@ import android.graphics.drawable.Drawable;
 
 public class BookManagementActivity extends AppCompatActivity {
 
-    // Campos obligatorios
+    private static final String TAG = "BookManagementActivity";
+
     private EditText etTitulo, etAutor, etAnio, etEditorial, etNumeroEdicion;
     private EditText etIsbn, etNumeroPaginas, etDescripcion;
     private Spinner spinnerCategoria, spinnerIdioma, spinnerEstado;
-
     private MaterialButton btnAgregarLibro, btnVolver, btnTomarFoto;
     private LinearLayout layoutListaLibros;
     private ImageView ivFotoLibro;
@@ -50,14 +47,11 @@ public class BookManagementActivity extends AppCompatActivity {
     private static final int GALLERY_REQUEST_CODE = 102;
     private String fotoBase64 = "";
 
-    // Arrays actualizados
     private String[] categorias = {"Novela", "Ciencia Ficción", "Fábula", "Historia", "Poesía",
             "Biografía", "Ensayo", "Infantil", "Técnico", "Académico",
             "Autoayuda", "Filosofía", "Arte", "Ciencia", "Religión"};
-
     private String[] idiomas = {"Español", "Inglés", "Francés", "Alemán", "Italiano",
             "Portugués", "Catalán", "Otros"};
-
     private String[] estados = {"Disponible", "Prestado", "Reservado", "En reparación", "Extraviado"};
 
     private FirebaseFirestore db;
@@ -73,15 +67,11 @@ public class BookManagementActivity extends AppCompatActivity {
         initializeViews();
         setupSpinners();
         setupButtonListeners();
-
-        // ✅ IMPORTANTE: Cargar datos de sugerencia ANTES de cargar la lista
         cargarDatosDesdeSugerencia();
-
         cargarListaLibros();
     }
 
     private void initializeViews() {
-        // Campos de texto
         etTitulo = findViewById(R.id.etTitulo);
         etAutor = findViewById(R.id.etAutor);
         etAnio = findViewById(R.id.etAnio);
@@ -90,13 +80,9 @@ public class BookManagementActivity extends AppCompatActivity {
         etIsbn = findViewById(R.id.etIsbn);
         etNumeroPaginas = findViewById(R.id.etNumeroPaginas);
         etDescripcion = findViewById(R.id.etDescripcion);
-
-        // Spinners
         spinnerCategoria = findViewById(R.id.spinnerCategoria);
         spinnerIdioma = findViewById(R.id.spinnerIdioma);
         spinnerEstado = findViewById(R.id.spinnerEstado);
-
-        // Botones e imagen
         btnAgregarLibro = findViewById(R.id.btnAgregarLibro);
         btnVolver = findViewById(R.id.btnVolver);
         btnTomarFoto = findViewById(R.id.btnTomarFoto);
@@ -106,19 +92,16 @@ public class BookManagementActivity extends AppCompatActivity {
     }
 
     private void setupSpinners() {
-        // Spinner de categorías
         ArrayAdapter<String> categoriaAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, categorias);
         categoriaAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerCategoria.setAdapter(categoriaAdapter);
 
-        // Spinner de idiomas
         ArrayAdapter<String> idiomaAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, idiomas);
         idiomaAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerIdioma.setAdapter(idiomaAdapter);
 
-        // Spinner de estados
         ArrayAdapter<String> estadoAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, estados);
         estadoAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -137,15 +120,9 @@ public class BookManagementActivity extends AppCompatActivity {
         builder.setTitle("Seleccionar foto del libro");
         builder.setItems(new String[]{"Tomar foto", "Elegir de galería", "Cancelar"}, (dialog, which) -> {
             switch (which) {
-                case 0:
-                    checkCameraPermission();
-                    break;
-                case 1:
-                    abrirGaleria();
-                    break;
-                case 2:
-                    dialog.dismiss();
-                    break;
+                case 0: checkCameraPermission(); break;
+                case 1: abrirGaleria(); break;
+                case 2: dialog.dismiss(); break;
             }
         });
         builder.show();
@@ -166,7 +143,7 @@ public class BookManagementActivity extends AppCompatActivity {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 abrirCamara();
             } else {
-                Toast.makeText(this, "Se necesita permiso de cámara para tomar fotos", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Se necesita permiso de cámara", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -187,7 +164,6 @@ public class BookManagementActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (resultCode == RESULT_OK) {
             Bitmap imageBitmap = null;
             if (requestCode == CAMERA_REQUEST_CODE && data != null) {
@@ -210,9 +186,9 @@ public class BookManagementActivity extends AppCompatActivity {
     }
 
     private String bitmapToBase64(Bitmap bitmap) {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, byteArrayOutputStream);
-        byte[] byteArray = byteArrayOutputStream.toByteArray();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
+        byte[] byteArray = baos.toByteArray();
         return Base64.encodeToString(byteArray, Base64.DEFAULT);
     }
 
@@ -225,9 +201,8 @@ public class BookManagementActivity extends AppCompatActivity {
         }
     }
 
-    // === GUARDAR LIBRO EN FIREBASE (ACTUALIZADO) ===
+    // ✅ GUARDAR LIBRO CON CAMPOS EN INGLÉS
     private void agregarLibro() {
-        // Obtener todos los campos
         String titulo = etTitulo.getText().toString().trim();
         String autor = etAutor.getText().toString().trim();
         String anio = etAnio.getText().toString().trim();
@@ -240,45 +215,45 @@ public class BookManagementActivity extends AppCompatActivity {
         String descripcion = etDescripcion.getText().toString().trim();
         String estado = spinnerEstado.getSelectedItem().toString();
 
-        // Validar campos obligatorios
         if (!validarDatosLibro(titulo, autor, anio, editorial, numeroEdicion, isbn, numeroPaginasStr, descripcion)) {
             return;
         }
 
         int numeroPaginas = Integer.parseInt(numeroPaginasStr);
 
-        // Crear el mapa de datos
+        // ✅ CAMPOS EN INGLÉS
         Map<String, Object> libro = new HashMap<>();
-        libro.put("titulo", titulo);
-        libro.put("autor", autor);
-        libro.put("anio", anio);
-        libro.put("editorial", editorial);
-        libro.put("numero_edicion", numeroEdicion);
+        libro.put("title", titulo);
+        libro.put("author", autor);
+        libro.put("year", anio);
+        libro.put("publisher", editorial);
+        libro.put("edition", numeroEdicion);
         libro.put("isbn", isbn);
-        libro.put("categoria", categoria);
-        libro.put("numero_paginas", numeroPaginas);
-        libro.put("idioma", idioma);
-        libro.put("descripcion", descripcion);
-        libro.put("estado", estado);
-        libro.put("foto", fotoBase64);
+        libro.put("category", categoria);
+        libro.put("pages", numeroPaginas);
+        libro.put("language", idioma);
+        libro.put("description", descripcion);
+        libro.put("status", estado);
+        libro.put("fotoBase64", fotoBase64);
         libro.put("rating", 0.0f);
         libro.put("ratingCount", 0);
         libro.put("createdAt", System.currentTimeMillis());
 
-        // Guardar en Firestore
+        Log.d(TAG, "💾 Guardando libro: " + titulo + " con campos en inglés");
+
         db.collection("libros")
                 .add(libro)
                 .addOnSuccessListener(documentReference -> {
+                    Log.d(TAG, "✅ Libro guardado: " + documentReference.getId());
                     Toast.makeText(this, "✅ Libro agregado correctamente", Toast.LENGTH_SHORT).show();
                     limpiarFormulario();
                     cargarListaLibros();
-
-                    // Scroll al inicio para ver la lista
                     scrollFormulario.post(() -> scrollFormulario.fullScroll(View.FOCUS_DOWN));
                 })
-                .addOnFailureListener(e ->
-                        Toast.makeText(this, "❌ Error al guardar: " + e.getMessage(), Toast.LENGTH_LONG).show()
-                );
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "❌ Error al guardar: " + e.getMessage());
+                    Toast.makeText(this, "❌ Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
     }
 
     private void limpiarFormulario() {
@@ -304,19 +279,16 @@ public class BookManagementActivity extends AppCompatActivity {
             etTitulo.requestFocus();
             return false;
         }
-
         if (autor.isEmpty()) {
             etAutor.setError("⚠️ Campo obligatorio");
             etAutor.requestFocus();
             return false;
         }
-
         if (anio.isEmpty() || !anio.matches("\\d{4}")) {
-            etAnio.setError("⚠️ Año inválido (formato: YYYY)");
+            etAnio.setError("⚠️ Año inválido (YYYY)");
             etAnio.requestFocus();
             return false;
         }
-
         int anioInt = Integer.parseInt(anio);
         int anioActual = Calendar.getInstance().get(Calendar.YEAR);
         if (anioInt < 1000 || anioInt > anioActual) {
@@ -324,53 +296,46 @@ public class BookManagementActivity extends AppCompatActivity {
             etAnio.requestFocus();
             return false;
         }
-
         if (editorial.isEmpty()) {
             etEditorial.setError("⚠️ Campo obligatorio");
             etEditorial.requestFocus();
             return false;
         }
-
         if (numeroEdicion.isEmpty()) {
             etNumeroEdicion.setError("⚠️ Campo obligatorio");
             etNumeroEdicion.requestFocus();
             return false;
         }
-
         if (isbn.isEmpty() || isbn.length() < 10) {
             etIsbn.setError("⚠️ ISBN inválido (mínimo 10 caracteres)");
             etIsbn.requestFocus();
             return false;
         }
-
         if (numeroPaginas.isEmpty() || !numeroPaginas.matches("\\d+")) {
             etNumeroPaginas.setError("⚠️ Número de páginas inválido");
             etNumeroPaginas.requestFocus();
             return false;
         }
-
         int paginas = Integer.parseInt(numeroPaginas);
         if (paginas <= 0 || paginas > 10000) {
-            etNumeroPaginas.setError("⚠️ Número de páginas fuera de rango (1-10000)");
+            etNumeroPaginas.setError("⚠️ Fuera de rango (1-10000)");
             etNumeroPaginas.requestFocus();
             return false;
         }
-
         if (descripcion.isEmpty()) {
             etDescripcion.setError("⚠️ Campo obligatorio");
             etDescripcion.requestFocus();
             return false;
         }
-
         return true;
     }
 
-    // === CARGAR LIBROS DESDE FIREBASE (ACTUALIZADO) ===
+    // ✅ CARGAR LIBROS CON COMPATIBILIDAD INGLÉS/ESPAÑOL
     private void cargarListaLibros() {
         layoutListaLibros.removeAllViews();
+        Log.d(TAG, "📚 Cargando libros desde Firestore...");
 
         db.collection("libros")
-                .orderBy("createdAt", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (queryDocumentSnapshots.isEmpty()) {
@@ -383,32 +348,74 @@ public class BookManagementActivity extends AppCompatActivity {
                         return;
                     }
 
-                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
-                        String titulo = doc.getString("titulo");
-                        String autor = doc.getString("autor");
-                        String categoria = doc.getString("categoria");
-                        String anio = doc.getString("anio");
-                        String editorial = doc.getString("editorial");
-                        String numeroEdicion = doc.getString("numero_edicion");
-                        String isbn = doc.getString("isbn");
-                        Long numeroPaginas = doc.getLong("numero_paginas");
-                        String idioma = doc.getString("idioma");
-                        String descripcion = doc.getString("descripcion");
-                        String estado = doc.getString("estado");
-                        String foto = doc.getString("foto");
+                    int totalLibros = queryDocumentSnapshots.size();
+                    Log.d(TAG, "✅ Total de libros encontrados: " + totalLibros);
+                    Toast.makeText(this, "📚 Total de libros: " + totalLibros, Toast.LENGTH_SHORT).show();
 
-                        CardView card = crearCardLibro(titulo, autor, categoria, anio, editorial,
-                                numeroEdicion, isbn, numeroPaginas != null ? numeroPaginas.intValue() : 0,
-                                idioma, descripcion, estado, foto);
+                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                        // ✅ Leer campos en inglés primero, luego fallback a español
+                        String titulo = doc.getString("title");
+                        if (titulo == null) titulo = doc.getString("titulo");
+
+                        String autor = doc.getString("author");
+                        if (autor == null) autor = doc.getString("autor");
+
+                        String categoria = doc.getString("category");
+                        if (categoria == null) categoria = doc.getString("categoria");
+
+                        String anio = doc.getString("year");
+                        if (anio == null) anio = doc.getString("anio");
+
+                        String editorial = doc.getString("publisher");
+                        if (editorial == null) editorial = doc.getString("editorial");
+
+                        String numeroEdicion = doc.getString("edition");
+                        if (numeroEdicion == null) numeroEdicion = doc.getString("numero_edicion");
+
+                        String isbn = doc.getString("isbn");
+
+                        Long numeroPaginasLong = doc.getLong("pages");
+                        if (numeroPaginasLong == null) numeroPaginasLong = doc.getLong("numero_paginas");
+                        int numeroPaginas = numeroPaginasLong != null ? numeroPaginasLong.intValue() : 0;
+
+                        String idioma = doc.getString("language");
+                        if (idioma == null) idioma = doc.getString("idioma");
+
+                        String descripcion = doc.getString("description");
+                        if (descripcion == null) descripcion = doc.getString("descripcion");
+
+                        String estado = doc.getString("status");
+                        if (estado == null) estado = doc.getString("estado");
+
+                        String foto = doc.getString("fotoBase64");
+                        if (foto == null) foto = doc.getString("foto");
+
+                        // Valores por defecto
+                        if (titulo == null) titulo = "Sin título";
+                        if (autor == null) autor = "Sin autor";
+                        if (categoria == null) categoria = "Sin categoría";
+                        if (anio == null) anio = "----";
+                        if (editorial == null) editorial = "Sin editorial";
+                        if (numeroEdicion == null) numeroEdicion = "1";
+                        if (isbn == null) isbn = "Sin ISBN";
+                        if (idioma == null) idioma = "Sin idioma";
+                        if (descripcion == null) descripcion = "Sin descripción";
+                        if (estado == null) estado = "Disponible";
+
+                        Log.d(TAG, "📖 Libro: " + titulo + " | Autor: " + autor);
+
+                        CardView card = crearCardLibro(doc.getId(), titulo, autor, categoria, anio, editorial,
+                                numeroEdicion, isbn, numeroPaginas, idioma, descripcion, estado, foto);
                         layoutListaLibros.addView(card);
                     }
                 })
-                .addOnFailureListener(e ->
-                        Toast.makeText(this, "Error al cargar libros: " + e.getMessage(), Toast.LENGTH_SHORT).show()
-                );
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "❌ Error cargando libros: " + e.getMessage());
+                    Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 
-    private CardView crearCardLibro(String titulo, String autor, String categoria, String anio,
+    private CardView crearCardLibro(String docId, String titulo, String autor, String categoria, String anio,
                                     String editorial, String numeroEdicion, String isbn,
                                     int numeroPaginas, String idioma, String descripcion,
                                     String estado, String fotoBase64) {
@@ -427,7 +434,7 @@ public class BookManagementActivity extends AppCompatActivity {
         cardLayout.setOrientation(LinearLayout.HORIZONTAL);
         cardLayout.setPadding(16, 16, 16, 16);
 
-        // Imagen del libro
+        // Imagen
         ImageView ivMiniatura = new ImageView(this);
         LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(140, 200);
         imageParams.setMargins(0, 0, 16, 0);
@@ -441,10 +448,9 @@ public class BookManagementActivity extends AppCompatActivity {
         } else {
             ivMiniatura.setImageResource(R.drawable.ic_book_placeholder);
         }
-
         cardLayout.addView(ivMiniatura);
 
-        // Información del libro
+        // Información
         LinearLayout infoLayout = new LinearLayout(this);
         infoLayout.setOrientation(LinearLayout.VERTICAL);
         infoLayout.setLayoutParams(new LinearLayout.LayoutParams(
@@ -452,7 +458,6 @@ public class BookManagementActivity extends AppCompatActivity {
                 LinearLayout.LayoutParams.WRAP_CONTENT
         ));
 
-        // Título
         TextView tvTitulo = new TextView(this);
         tvTitulo.setText("📖 " + titulo);
         tvTitulo.setTextSize(18);
@@ -460,31 +465,30 @@ public class BookManagementActivity extends AppCompatActivity {
         tvTitulo.setTextColor(getResources().getColor(R.color.colorPrimary));
         infoLayout.addView(tvTitulo);
 
-        // Autor
         TextView tvAutor = new TextView(this);
         tvAutor.setText("✍️ " + autor);
         tvAutor.setTextSize(15);
+        tvAutor.setTextColor(getResources().getColor(R.color.colorTextPrimary));
         infoLayout.addView(tvAutor);
 
-        // Editorial y año
         TextView tvEditorialAnio = new TextView(this);
         tvEditorialAnio.setText("🏢 " + editorial + " • " + anio + " (Ed. " + numeroEdicion + ")");
         tvEditorialAnio.setTextSize(13);
+        tvEditorialAnio.setTextColor(getResources().getColor(R.color.colorTextSecondary));
         infoLayout.addView(tvEditorialAnio);
 
-        // ISBN
         TextView tvIsbn = new TextView(this);
         tvIsbn.setText("📚 ISBN: " + isbn);
         tvIsbn.setTextSize(12);
+        tvIsbn.setTextColor(getResources().getColor(R.color.colorTextSecondary));
         infoLayout.addView(tvIsbn);
 
-        // Categoría, páginas e idioma
         TextView tvDetalles = new TextView(this);
         tvDetalles.setText("🔖 " + categoria + " • 📄 " + numeroPaginas + " págs • 🌐 " + idioma);
         tvDetalles.setTextSize(12);
+        tvDetalles.setTextColor(getResources().getColor(R.color.colorTextSecondary));
         infoLayout.addView(tvDetalles);
 
-        // Estado
         TextView tvEstado = new TextView(this);
         tvEstado.setText("📊 Estado: " + estado);
         tvEstado.setTextSize(13);
@@ -493,46 +497,82 @@ public class BookManagementActivity extends AppCompatActivity {
         tvEstado.setTextColor(getResources().getColor(colorEstado));
         infoLayout.addView(tvEstado);
 
-        // Descripción (truncada)
         if (descripcion != null && !descripcion.isEmpty()) {
             TextView tvDescripcion = new TextView(this);
             String descripcionCorta = descripcion.length() > 100 ?
                     descripcion.substring(0, 100) + "..." : descripcion;
             tvDescripcion.setText("📝 " + descripcionCorta);
             tvDescripcion.setTextSize(12);
+            tvDescripcion.setTextColor(getResources().getColor(R.color.colorTextSecondary));
             tvDescripcion.setMaxLines(2);
             infoLayout.addView(tvDescripcion);
         }
 
+        // Botones
+        LinearLayout buttonsLayout = new LinearLayout(this);
+        buttonsLayout.setOrientation(LinearLayout.HORIZONTAL);
+        LinearLayout.LayoutParams buttonLayoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        buttonLayoutParams.setMargins(0, 8, 0, 0);
+        buttonsLayout.setLayoutParams(buttonLayoutParams);
+
+        Button btnEliminar = new Button(this);
+        btnEliminar.setText("ELIMINAR");
+        btnEliminar.setTextSize(12);
+        btnEliminar.setBackgroundColor(getResources().getColor(R.color.red));
+        btnEliminar.setTextColor(getResources().getColor(R.color.white));
+        btnEliminar.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        ));
+        btnEliminar.setOnClickListener(v -> {
+            new AlertDialog.Builder(this)
+                    .setTitle("Eliminar libro")
+                    .setMessage("¿Estás seguro de eliminar \"" + titulo + "\"?")
+                    .setPositiveButton("Eliminar", (dialog, which) -> eliminarLibro(docId))
+                    .setNegativeButton("Cancelar", null)
+                    .show();
+        });
+        buttonsLayout.addView(btnEliminar);
+
+        infoLayout.addView(buttonsLayout);
         cardLayout.addView(infoLayout);
         cardView.addView(cardLayout);
 
         return cardView;
     }
 
+    private void eliminarLibro(String docId) {
+        db.collection("libros").document(docId)
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "✅ Libro eliminado", Toast.LENGTH_SHORT).show();
+                    cargarListaLibros();
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, "❌ Error: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                );
+    }
+
     private void cargarDatosDesdeSugerencia() {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            // Datos básicos
             String tituloSugerencia = extras.getString("titulo_sugerencia");
             String autorSugerencia = extras.getString("autor_sugerencia");
             String categoriaSugerencia = extras.getString("categoria_sugerencia");
-
-            // ✅ NUEVOS DATOS: edición, ISBN, año, imagen
             String edicionSugerencia = extras.getString("edicion_sugerencia");
             String isbnSugerencia = extras.getString("isbn_sugerencia");
             String yearSugerencia = extras.getString("year_sugerencia");
-            String coverUrlSugerencia = extras.getString("cover_url_sugerencia");
+            String coverBase64 = extras.getString("cover_base64_sugerencia");
 
-            // ✅ Pre-llenar campos básicos
             if (tituloSugerencia != null && !tituloSugerencia.isEmpty()) {
                 etTitulo.setText(tituloSugerencia);
             }
-
             if (autorSugerencia != null && !autorSugerencia.isEmpty()) {
                 etAutor.setText(autorSugerencia);
             }
-
             if (categoriaSugerencia != null && !categoriaSugerencia.isEmpty()) {
                 for (int i = 0; i < categorias.length; i++) {
                     if (categorias[i].equals(categoriaSugerencia)) {
@@ -541,75 +581,24 @@ public class BookManagementActivity extends AppCompatActivity {
                     }
                 }
             }
-
-            // ✅ Pre-llenar EDICIÓN
             if (edicionSugerencia != null && !edicionSugerencia.isEmpty()) {
                 etNumeroEdicion.setText(edicionSugerencia);
-                Toast.makeText(this, "✅ Edición cargada: " + edicionSugerencia,
-                        Toast.LENGTH_SHORT).show();
             }
-
-            // ✅ Pre-llenar ISBN
             if (isbnSugerencia != null && !isbnSugerencia.isEmpty()) {
                 etIsbn.setText(isbnSugerencia);
-                Toast.makeText(this, "✅ ISBN cargado: " + isbnSugerencia,
-                        Toast.LENGTH_SHORT).show();
             }
-
-            // ✅ Pre-llenar AÑO
             if (yearSugerencia != null && !yearSugerencia.isEmpty()) {
                 etAnio.setText(yearSugerencia);
-                Toast.makeText(this, "✅ Año cargado: " + yearSugerencia,
-                        Toast.LENGTH_SHORT).show();
+            }
+            if (coverBase64 != null && !coverBase64.isEmpty()) {
+                Bitmap bitmap = base64ToBitmap(coverBase64);
+                if (bitmap != null) {
+                    ivFotoLibro.setImageBitmap(bitmap);
+                    fotoBase64 = coverBase64;
+                }
             }
 
-            // ✅ DESCARGAR Y MOSTRAR IMAGEN de la sugerencia
-            if (coverUrlSugerencia != null && !coverUrlSugerencia.isEmpty()) {
-                descargarImagenDeSugerencia(coverUrlSugerencia);
-            }
-
-            // Mensaje informativo
-            Toast.makeText(this,
-                    "📝 Datos cargados desde sugerencia. Completa los campos faltantes.",
-                    Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "📝 Datos cargados desde sugerencia", Toast.LENGTH_LONG).show();
         }
-    }
-
-    // ✅ NUEVO MÉTODO: Descargar imagen desde Firebase Storage
-    private void descargarImagenDeSugerencia(String imageUrl) {
-        // Mostrar indicador de carga
-        Toast.makeText(this, "⏳ Descargando imagen de portada...", Toast.LENGTH_SHORT).show();
-
-        Glide.with(this)
-                .asBitmap()
-                .load(imageUrl)
-                .timeout(15000) // Timeout de 15 segundos
-                .into(new CustomTarget<Bitmap>() {
-                    @Override
-                    public void onResourceReady(Bitmap bitmap, Transition<? super Bitmap> transition) {
-                        // Imagen descargada exitosamente
-                        ivFotoLibro.setImageBitmap(bitmap);
-                        fotoBase64 = bitmapToBase64(bitmap);
-
-                        Toast.makeText(BookManagementActivity.this,
-                                "✅ Imagen de portada cargada",
-                                Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onLoadFailed(Drawable errorDrawable) {
-                        // Error al descargar imagen
-                        Toast.makeText(BookManagementActivity.this,
-                                "⚠️ No se pudo cargar la imagen. Puedes agregar una nueva.",
-                                Toast.LENGTH_LONG).show();
-
-                        ivFotoLibro.setImageResource(R.drawable.ic_camera);
-                    }
-
-                    @Override
-                    public void onLoadCleared(Drawable placeholder) {
-                        // Cleanup si es necesario
-                    }
-                });
     }
 }

@@ -51,16 +51,50 @@
                         android:textColor="@color/colorPrimary"
                         android:layout_marginBottom="8dp"/>
 
+                    <!-- NUEVO: Monto total (equivalente a tvTotalAmount que requiere updateStatistics) -->
                     <TextView
-                        android:id="@+id/tvTotalSpent"
+                        android:id="@+id/tvTotalAmount"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Gasto total: $0.00 MXN"
+                        android:text="Monto total: $0.00"
                         android:textSize="16sp"
-                        android:textColor="@color/colorTextPrimary"/>
+                        android:textColor="@color/colorTextPrimary"
+                        android:layout_marginBottom="8dp"/>
+
+                    <!-- NUEVO: Pendientes -->
+                    <TextView
+                        android:id="@+id/tvTotalPending"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Pendientes: 0"
+                        android:textSize="16sp"
+                        android:textColor="@color/orange"
+                        android:layout_marginBottom="6dp"/>
+
+                    <!-- NUEVO: Completadas -->
+                    <TextView
+                        android:id="@+id/tvTotalCompleted"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Completadas: 0"
+                        android:textSize="16sp"
+                        android:textColor="@color/green"/>
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
+
+
+            <!-- Botón Ver Tickets -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnViewAllTickets"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="🎫 Ver Todos Mis Tickets"
+                android:backgroundTint="@color/green"
+                app:icon="@android:drawable/ic_menu_view"
+                app:iconGravity="textStart"/>
+
 
             <!-- Filtro por estado -->
             <androidx.cardview.widget.CardView
@@ -89,16 +123,17 @@
                         android:layout_height="wrap_content"
                         android:padding="12dp"
                         android:background="@color/light_brown"/>
-
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Lista de compras -->
+
+            <!-- Lista de compras (para inflar dinámicamente) -->
             <LinearLayout
                 android:id="@+id/layoutPurchasesList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"/>
+                android:orientation="vertical" />
+
 
             <!-- Estado vacío -->
             <LinearLayout
@@ -124,7 +159,6 @@
                     android:textSize="18sp"
                     android:textColor="@color/colorTextSecondary"
                     android:textAlignment="center"/>
-
             </LinearLayout>
 
         </LinearLayout>

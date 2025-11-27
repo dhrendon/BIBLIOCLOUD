@@ -16,11 +16,13 @@ public class Suggestion {
     private String userEmail;
     private String userId;
 
-    // 🆕 NUEVOS CAMPOS
-    private String edition;        // Edición (opcional)
-    private String isbn;           // ISBN (opcional)
-    private String year;           // 🆕 Año del libro (opcional)
-    private String coverImageUrl;  // URL de la imagen en Firebase Storage
+    // 🆕 CAMPOS ADICIONALES
+    private String edition;
+    private String isbn;
+    private String year;
+
+    // 🔄 CAMBIO: Imagen en Base64 en lugar de URL
+    private String coverImageBase64;  // Imagen en formato Base64
 
     @ServerTimestamp
     private Date suggestionDate;
@@ -38,7 +40,7 @@ public class Suggestion {
         this.suggestionDate = new Date();
     }
 
-    // Getters y Setters existentes
+    // Getters y Setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
@@ -66,19 +68,18 @@ public class Suggestion {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    // 🆕 NUEVOS GETTERS Y SETTERS
     public String getEdition() { return edition; }
     public void setEdition(String edition) { this.edition = edition; }
 
     public String getIsbn() { return isbn; }
     public void setIsbn(String isbn) { this.isbn = isbn; }
 
-    public String getCoverImageUrl() { return coverImageUrl; }
-    public void setCoverImageUrl(String coverImageUrl) { this.coverImageUrl = coverImageUrl; }
-
-    // 🆕 GETTER Y SETTER PARA AÑO
     public String getYear() { return year; }
     public void setYear(String year) { this.year = year; }
+
+    // 🔄 GETTER Y SETTER PARA BASE64
+    public String getCoverImageBase64() { return coverImageBase64; }
+    public void setCoverImageBase64(String coverImageBase64) { this.coverImageBase64 = coverImageBase64; }
 
     public String getFormattedDate() {
         if (suggestionDate == null) return "";

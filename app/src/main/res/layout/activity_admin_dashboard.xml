@@ -72,7 +72,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="📚 Libros"
+                        android:text="Libros"
                         android:textSize="14sp"
                         android:textColor="@color/colorTextSecondary"
                         android:gravity="center"/>
@@ -111,7 +111,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="👥 Usuarios"
+                        android:text="Usuarios"
                         android:textSize="14sp"
                         android:textColor="@color/colorTextSecondary"
                         android:gravity="center"/>
@@ -150,7 +150,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="📋 Préstamos"
+                        android:text="Préstamos"
                         android:textSize="14sp"
                         android:textColor="@color/colorTextSecondary"
                         android:gravity="center"/>
@@ -228,7 +228,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="🛒 Compras"
+                        android:text="Compras"
                         android:textSize="14sp"
                         android:textColor="@color/colorTextSecondary"
                         android:gravity="center"/>

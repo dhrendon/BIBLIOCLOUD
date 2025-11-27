@@ -11,16 +11,18 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- Título -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="💰 Panel de Cajero"
+            android:text="Panel de Cajero"
             android:textSize="28sp"
             android:textStyle="bold"
             android:textColor="@color/colorPrimary"
             android:gravity="center"
             android:layout_marginBottom="8dp"/>
 
+        <!-- Bienvenida -->
         <TextView
             android:id="@+id/tvWelcome"
             android:layout_width="match_parent"
@@ -31,16 +33,18 @@
             android:gravity="center"
             android:layout_marginBottom="8dp"/>
 
+        <!-- Sucursal -->
         <TextView
             android:id="@+id/tvBranchName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="📍 Sucursal"
+            android:text="Sucursal"
             android:textSize="16sp"
             android:textColor="@color/colorTextSecondary"
             android:gravity="center"
             android:layout_marginBottom="24dp"/>
 
+        <!-- Tarjeta de órdenes pendientes -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -64,10 +68,10 @@
                     android:textSize="24sp"
                     android:textStyle="bold"
                     android:textColor="@color/colorPrimary"/>
-
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
+        <!-- Sección opciones -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -77,59 +81,63 @@
             android:textColor="@color/colorPrimary"
             android:layout_marginBottom="16dp"/>
 
+        <!-- Botón cobrar órdenes -->
         <Button
             android:id="@+id/btnCobrarOrdenes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:backgroundTint="@color/accent_brown"
-            android:drawableLeft="@android:drawable/ic_menu_sort_by_size"
-            android:drawablePadding="8dp"
             android:padding="20dp"
-            android:text="💰 Cobrar Órdenes de Compra"
-            android:textSize="18sp" />
+            android:text="Cobrar Órdenes de Compra"
+            android:textSize="18sp"
+            android:textColor="@color/colorTextPrimary"/>
 
+        <!-- Ver pagos del día -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnVerPagosDiarios"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:padding="16dp"
-            android:text="💵 Ver Pagos del Día"
+            android:text="Ver Pagos del Día"
             android:textSize="16sp"
-            app:icon="@drawable/ic_payments"
-            app:iconGravity="start" />
+            android:textColor="@color/white"
+            app:icon="@null"/>
 
+        <!-- Resumen de pagos -->
         <TextView
             android:id="@+id/tvTodayPayments"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Pagos hoy: 0 | $0.00"
             android:textSize="14sp"
+            android:textColor="@color/colorTextPrimary"
             android:padding="8dp"
             android:background="@color/light_brown"
             android:layout_marginTop="4dp"/>
 
+        <!-- Ver inventario -->
         <Button
             android:id="@+id/btnVerInventario"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="📚 Ver Ubicación de Libros"
+            android:text="Ver Ubicación de Libros"
             android:textSize="18sp"
+            android:textColor="@color/white"
             android:backgroundTint="@color/colorPrimary"
             android:layout_marginBottom="24dp"
-            android:padding="20dp"
-            android:drawableLeft="@android:drawable/ic_menu_search"
-            android:drawablePadding="8dp"/>
+            android:padding="20dp"/>
 
+        <!-- Cerrar sesión -->
         <Button
             android:id="@+id/btnCerrarSesion"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="🚪 Cerrar Sesión"
+            android:text="Cerrar Sesión"
             android:textSize="16sp"
+            android:textColor="@color/white"
             android:backgroundTint="@color/red"
             android:padding="16dp"/>
-
     </LinearLayout>
 </ScrollView>
